@@ -19,6 +19,7 @@
 #
 
 import collections as _collections
+import os as _os
 import proton as _proton
 import proton.handlers as _handlers
 import proton.reactor as _reactor
@@ -39,13 +40,13 @@ class BrokerCommand:
 
     def init(self):
         try:
-            self.host = _sys.argv[1]
-        except IndexError:
-            self.host = "0.0.0.0"
+            self.host = _os.environ["MESSAGING_SERVICE_HOST"]
+        except KeyError:
+            self.host = "localhost"
 
         try:
-            self.port = _sys.argv[2]
-        except IndexError:
+            self.port = _os.environ["MESSAGING_SERVICE_PORT"]
+        except KeyError:
             self.port = 5672
 
     def main(self):
