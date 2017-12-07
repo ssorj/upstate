@@ -9,6 +9,6 @@
     },
     "repository": {
         "type": "git",
-        "url" : "https://github.com/ssorj/upstate-web-nodejs.git"
+        "url" : "https://github.com/ssorj/upstate.git"
     }
 }

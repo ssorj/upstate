@@ -8,6 +8,6 @@
     },
     "repository": {
         "type": "git",
-        "url" : "https://github.com/ssorj/upstate-worker-nodejs.git"
+        "url" : "https://github.com/ssorj/upstate.git"
     }
 }
