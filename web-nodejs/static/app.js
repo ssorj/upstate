@@ -21,73 +21,21 @@
 
 "use strict";
 
-var $ = document.querySelector.bind(document);
-var $$ = document.querySelectorAll.bind(document);
-
-Element.prototype.$ = function () {
-  return this.querySelector.apply(this, arguments);
-};
-
-Element.prototype.$$ = function () {
-  return this.querySelectorAll.apply(this, arguments);
-};
-
 var upstate = {
-    openRequest: function (method, url, handler) {
-        var request = new XMLHttpRequest();
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                handler(request);
-            }
-        };
-
-        request.open(method, url);
-
-        return request;
-    },
-
-    minFetchDataInterval: 500,
-    maxFetchDataInterval: 60 * 1000,
-    currentFetchDataInterval: null,
-    currentTimeoutId: null,
-    data: {},
-
-    fetchData: function () {
-        console.log("Fetching data");
-
-        var request = upstate.openRequest("GET", "/data", function (request) {
-            if (request.status === 200) {
-                upstate.data = JSON.parse(request.responseText);
-                upstate.fireStateChangeEvent();
-            }
-        });
-
-        request.send(null);
-    },
-
-    fireStateChangeEvent: function () {
-        window.dispatchEvent(new Event("statechange"));
-    },
+    data: null,
 
     fetchDataPeriodically: function () {
-        window.clearTimeout(upstate.currentTimeoutId);
-        upstate.currentFetchDataInterval = upstate.minFetchDataInterval;
+        function handler(data) {
+            upstate.data = data;
+        }
 
-        upstate.doFetchDataPeriodically();
+        gesso.fetchPeriodically("/data", handler);
     },
 
-    doFetchDataPeriodically: function () {
-        upstate.currentTimeoutId = window.setTimeout(upstate.doFetchDataPeriodically, upstate.currentFetchDataInterval);
-        upstate.currentFetchDataInterval = Math.floor(upstate.currentFetchDataInterval * 2, upstate.maxFetchDataInterval);
-
-        upstate.fetchData();
-    },
-
-    sendRequest: function() {
+    sendRequest: function () {
         console.log("Sending request");
 
-        var request = upstate.openRequest("POST", "/send-request", function (request) {
+        var request = gesso.openRequest("POST", "/send-request", function (request) {
             if (request.status === 200) {
                 upstate.fetchDataPeriodically();
             }
