@@ -42,7 +42,7 @@ class BrokerCommand:
         try:
             self.host = _os.environ["MESSAGING_SERVICE_HOST"]
         except KeyError:
-            self.host = "localhost"
+            self.host = "127.0.0.1"
 
         try:
             self.port = _os.environ["MESSAGING_SERVICE_PORT"]
@@ -72,7 +72,7 @@ class BrokerCommand:
     def print_message(self, message, *args):
         message = message[0].upper() + message[1:]
         message = message.format(*args)
-        message = "{0}: {1}".format(self.container.container_id, message)
+        message = "BROKER: {0}".format(message)
 
         _sys.stderr.write("{0}\n".format(message))
         _sys.stderr.flush()

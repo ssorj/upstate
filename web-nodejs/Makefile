@@ -1,9 +1,9 @@
 .PHONY: run
-run: deps
+run: build
 	npm start
 
-.PHONY: deps
-deps:
+.PHONY: build
+build:
 	npm install
 
 .PHONY: clean

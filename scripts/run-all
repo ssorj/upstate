@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+
+from plano import *
+
+ENV["MESSAGING_SERVICE_PORT"] = str(random_port())
+
+#ENV["PN_TRACE_FRM"] = "1"
+#ENV["DEBUG"] = "rhea*"
+set_message_threshold("debug")
+
+broker = None
+worker = None
+
+try:
+    with working_dir("broker-python"):
+        broker = start_process("make run")
+
+    with working_dir("worker-nodejs"):
+        call_and_print_on_error("make clean build")
+        worker = start_process("make run")
+
+    with working_dir("web-nodejs"):
+        call_and_print_on_error("make clean build")
+        call("make run")
+except KeyboardInterrupt:
+    pass
+except CalledProcessError:
+    terminate_process(broker)
+    terminate_process(worker)

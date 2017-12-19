@@ -27,6 +27,7 @@ var upstate = {
     fetchDataPeriodically: function () {
         function handler(data) {
             upstate.data = data;
+            window.dispatchEvent(new Event("statechange"));
         }
 
         gesso.fetchPeriodically("/data", handler);
@@ -35,8 +36,8 @@ var upstate = {
     sendRequest: function () {
         console.log("Sending request");
 
-        var request = gesso.openRequest("POST", "/send-request", function (request) {
-            if (request.status === 200) {
+        var request = gesso.openRequest("POST", "/send-request", function (event) {
+            if (event.target.status === 200) {
                 upstate.fetchDataPeriodically();
             }
         });
