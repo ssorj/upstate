@@ -6,10 +6,12 @@ ENV["MESSAGING_SERVICE_PORT"] = str(random_port())
 
 #ENV["PN_TRACE_FRM"] = "1"
 #ENV["DEBUG"] = "rhea*"
+
 set_message_threshold("debug")
 
 broker = None
-worker = None
+worker_nodejs = None
+worker_spring = None
 
 try:
     with working_dir("broker-python"):
@@ -30,4 +32,5 @@ except KeyboardInterrupt:
     pass
 except CalledProcessError:
     terminate_process(broker)
-    terminate_process(worker)
+    terminate_process(worker_nodejs)
+    terminate_process(worker_spring)
