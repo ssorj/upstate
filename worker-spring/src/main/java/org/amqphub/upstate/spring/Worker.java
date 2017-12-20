@@ -36,15 +36,15 @@ public class Worker {
 
     @Component
     static class MessageHandler {
-        @JmsListener(destination = "example")
-        public String processMsg(String message) {
-            System.out.println("WORKER: XXX " + message);
+        @JmsListener(destination = "upstate/requests")
+        public String processMsg(String request) {
+            System.out.println("WORKER: Received request '" + request + "'");
 
-            message = message.toUpperCase();
+            String response = request.toUpperCase();
 
-            System.out.println("WORKER: YYY " + message);
+            System.out.println("WORKER: Sending response '" + response + "'");
 
-            return message;
+            return response;
         }
     }
 }
