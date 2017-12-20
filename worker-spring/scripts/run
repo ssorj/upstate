@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -ex
+
+if [[ -z $MESSAGING_SERVICE_HOST ]]; then
+   MESSAGING_SERVICE_HOST=localhost
+fi
+
+if [[ -z $MESSAGING_SERVICE_PORT ]]; then
+   MESSAGING_SERVICE_PORT=5672
+fi
+
+exec java -Damqphub.amqp10jms.remote-url=amqp://$MESSAGING_SERVICE_HOST:$MESSAGING_SERVICE_PORT -jar target/upstate-worker-spring-1.0.0-SNAPSHOT.jar

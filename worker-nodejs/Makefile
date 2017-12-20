@@ -1,7 +1,3 @@
-.PHONY: run
-run: build
-	npm start
-
 .PHONY: build
 build:
 	npm install
@@ -10,3 +6,7 @@ build:
 clean:
 	rm -rf node_modules
 	rm -f npm-debug.log
+
+.PHONY: run
+run:
+	npm start
