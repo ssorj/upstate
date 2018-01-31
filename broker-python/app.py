@@ -96,7 +96,8 @@ class _Queue:
 
         self.consumers.append(link)
 
-        self.command.info("Added consumer for {0} to {1}", link.connection, self)
+        self.command.info("Added consumer for {0} to {1}",
+                          link.connection.remote_container, self)
 
     def remove_consumer(self, link):
         assert link.is_sender
@@ -106,12 +107,14 @@ class _Queue:
         except ValueError:
             return
 
-        self.command.info("Removed consumer for {0} from {1}", link.connection, self)
+        self.command.info("Removed consumer for {0} from {1}",
+                          link.connection.remote_container, self)
 
     def store_message(self, delivery, message):
         self.messages.append(message)
 
-        self.command.notice("Stored {0} from {1} on {2}", message, delivery.connection, self)
+        self.command.notice("Stored {0} from {1} on {2}",
+                            message, delivery.connection.remote_container, self)
 
     def forward_messages(self):
         credit = sum([x.credit for x in self.consumers])
@@ -134,7 +137,8 @@ class _Queue:
                 consumer.send(message)
                 sent += 1
 
-                self.command.notice("Forwarded {0} on {1} to {2}", message, self, consumer.connection)
+                self.command.notice("Forwarded {0} on {1} to {2}",
+                                    message, self, consumer.connection.remote_container)
 
         self.consumers.rotate(sent)
 
@@ -189,16 +193,19 @@ class _Handler(_handlers.MessagingHandler):
         event.connection.container = event.container.container_id
 
     def on_connection_opened(self, event):
-        self.command.notice("Opened connection from {0}", event.connection)
+        self.command.notice("Opened connection from {0}",
+                            event.connection.remote_container)
 
     def on_connection_closing(self, event):
         self.remove_consumers(event.connection)
 
     def on_connection_closed(self, event):
-        self.command.notice("Closed connection from {0}", event.connection)
+        self.command.notice("Closed connection from {0}",
+                            event.connection.remote_container)
 
     def on_disconnected(self, event):
-        self.command.notice("Disconnected from {0}", event.connection)
+        self.command.notice("Disconnected from {0}",
+                            event.connection.remote_container)
         self.remove_consumers(event.connection)
 
     def remove_consumers(self, connection):

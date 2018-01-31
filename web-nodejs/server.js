@@ -31,7 +31,8 @@ const amqp_port = process.env.MESSAGING_SERVICE_PORT || 5672;
 
 // AMQP
 
-const container = rhea.create_container();
+const id = Math.floor(Math.random() * (10000 - 1000)) + 1000;
+const container = rhea.create_container({id: "web-nodejs-" + id});
 
 var sender = null;
 var receiver = null;

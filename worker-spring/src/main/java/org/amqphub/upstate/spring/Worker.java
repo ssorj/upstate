@@ -35,12 +35,14 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication
 @EnableJms
 public class Worker {
-    private static String clientId = "spring-" + (Math.round(Math.random() * (10000 - 1000)) + 1000);
+    private static String clientId = "worker-spring-" +
+        (Math.round(Math.random() * (10000 - 1000)) + 1000);
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory
     (ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
-        DefaultJmsListenerContainerFactory listenerFactory = new DefaultJmsListenerContainerFactory();
+        DefaultJmsListenerContainerFactory listenerFactory
+            = new DefaultJmsListenerContainerFactory();
         configurer.configure(listenerFactory, connectionFactory);
         listenerFactory.setTransactionManager(null);
         listenerFactory.setSessionTransacted(false);

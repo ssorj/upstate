@@ -25,7 +25,7 @@ const amqp_host = process.env.MESSAGING_SERVICE_HOST || "localhost";
 const amqp_port = process.env.MESSAGING_SERVICE_PORT || 5672;
 
 const id = Math.floor(Math.random() * (10000 - 1000)) + 1000;
-const container = rhea.create_container({id: "nodejs-" + id});
+const container = rhea.create_container({id: "worker-nodejs-" + id});
 
 function process_request(request) {
     return request.body.toUpperCase();
