@@ -38,12 +38,12 @@ container.on("connection_open", function (event) {
 container.on("message", function (event) {
     var request = event.message;
 
-    console.log("WORKER-NODEJS: Received request '" + request.body + "'");
+    console.log("WORKER-NODEJS: Received request '%s'", request.body);
 
     try {
         var response_body = process_request(request);
     } catch (e) {
-        console.error("WORKER-NODEJS: Failed processing message:", e);
+        console.error("WORKER-NODEJS: Failed processing message: %s", e);
         return;
     }
 
@@ -58,7 +58,7 @@ container.on("message", function (event) {
 
     event.connection.send(response);
 
-    console.log("WORKER-NODEJS: Sent response '" + response.body + "'");
+    console.log("WORKER-NODEJS: Sent response '%s'", response.body);
 });
 
 container.connect({host: amqp_host, port: amqp_port});

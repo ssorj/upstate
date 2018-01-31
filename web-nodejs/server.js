@@ -53,7 +53,7 @@ function send_requests() {
         
         sender.send(message);
 
-        console.log("WEB: Sent request '" + message.body + "'");
+        console.log("WEB: Sent request '%s'", message.body);
     }
 }
 
@@ -70,7 +70,7 @@ container.on("message", function (event) {
     var message = event.message;
     responses.push([message.application_properties.worker_id, message.body]);
 
-    console.log("WEB: Received response '" + message.body + "'");
+    console.log("WEB: Received response '%s'", message.body);
 });
 
 container.connect({host: amqp_host, port: amqp_port});
