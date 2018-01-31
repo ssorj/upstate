@@ -52,11 +52,16 @@ public class Worker {
     static class MessageHandler {
         @JmsListener(destination = "upstate/requests")
         public Message<String> receiveRequest(Message<String> request) {
-            String requestPayload = request.getPayload();
+            System.out.println("WORKER-SPRING: Received request '" + request.getPayload() + "'");
 
-            System.out.println("WORKER-SPRING: Received request '" + requestPayload + "'");
+            String responsePayload;
 
-            String responsePayload = requestPayload.toUpperCase();
+            try {
+                responsePayload = processRequest(request);
+            } catch (Exception e) {
+                System.err.println("WORKER-SPRING: Failed processing message: " + e);
+                return null;
+            }
 
             System.out.println("WORKER-SPRING: Sending response '" + responsePayload + "'");
 
@@ -66,6 +71,10 @@ public class Worker {
                 .build();
 
             return response;
+        }
+
+        public String processRequest(Message<String> request) {
+            return request.getPayload().toUpperCase();
         }
     }
 
