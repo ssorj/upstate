@@ -17,34 +17,59 @@
 
 package org.amqphub.upstate.spring;
 
+import java.lang.Math;
+import javax.jms.ConnectionFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.support.JmsHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-/**
- * Simple Reply Service example that sends and receives a message to the
- * configured JMSReplyTo address using Qpid JMS
- */
 @SpringBootApplication
 @EnableJms
 public class Worker {
-    public static void main(String[] args) {
-        SpringApplication.run(Worker.class, args);
+    private static String clientId = "spring-" + (Math.round(Math.random() * (10000 - 1000)) + 1000);
+
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory
+    (ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        DefaultJmsListenerContainerFactory listenerFactory = new DefaultJmsListenerContainerFactory();
+        configurer.configure(listenerFactory, connectionFactory);
+        listenerFactory.setTransactionManager(null);
+        listenerFactory.setSessionTransacted(false);
+        listenerFactory.setClientId(clientId);
+        return listenerFactory;
     }
 
     @Component
     static class MessageHandler {
         @JmsListener(destination = "upstate/requests")
-        public String processMsg(String request) {
-            System.out.println("WORKER: Received request '" + request + "'");
+        public Message<String> receiveRequest(Message<String> request) {
+            String requestPayload = request.getPayload();
 
-            String response = request.toUpperCase();
+            System.out.println("WORKER-SPRING: Received request '" + requestPayload + "'");
 
-            System.out.println("WORKER: Sending response '" + response + "'");
+            String responsePayload = requestPayload.toUpperCase();
+
+            System.out.println("WORKER-SPRING: Sending response '" + responsePayload + "'");
+
+            Message<String> response = MessageBuilder.withPayload(responsePayload)
+                .setHeader(JmsHeaders.CORRELATION_ID, request.getHeaders().get(MessageHeaders.ID))
+                .setHeader("worker_id", clientId)
+                .build();
 
             return response;
         }
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Worker.class, args);
     }
 }
