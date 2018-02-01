@@ -76,7 +76,7 @@ container.on("message", function (event) {
     if (event.receiver === worker_status_receiver) {
         var update = event.message.application_properties;
         console.log("WEB: Received status update from %s", update.worker_id);
-        worker_status[update.worker_id] = [update.timestamp, update.count];
+        worker_status[update.worker_id] = [update.timestamp, update.requests_processed];
         return;
     }
 

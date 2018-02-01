@@ -79,9 +79,9 @@ var upstate = {
         for (var worker_id in data.worker_status) {
             var status = data.worker_status[worker_id];
             var timestamp = status[0];
-            var count = status[1];
+            var requestsProcessed = status[1];
 
-            lines.unshift(("<b>" + worker_id + ":</b> ").padEnd(30) + timestamp + ", " + count);
+            lines.unshift(("<b>" + worker_id + ":</b> ").padEnd(30) + timestamp + ", " + requestsProcessed);
         }
 
         newContent.innerHTML = lines.join("\n");

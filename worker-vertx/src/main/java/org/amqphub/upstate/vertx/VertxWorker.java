@@ -24,6 +24,7 @@ import io.vertx.proton.ProtonReceiver;
 import io.vertx.proton.ProtonSender;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.qpid.proton.amqp.messaging.AmqpValue;
 import org.apache.qpid.proton.amqp.messaging.ApplicationProperties;
 import org.apache.qpid.proton.amqp.messaging.Section;
@@ -32,6 +33,8 @@ import org.apache.qpid.proton.message.Message;
 public class VertxWorker {
     private static String id = "worker-vertx-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
+
+    private static AtomicInteger requestsProcessed = new AtomicInteger(0);
 
     public static void main(String[] args) {
         try {
@@ -93,6 +96,8 @@ public class VertxWorker {
                 response.setApplicationProperties(new ApplicationProperties(props));
 
                 sender.send(response);
+
+                requestsProcessed.incrementAndGet();
             });
 
         sender.open();
@@ -122,7 +127,7 @@ public class VertxWorker {
                 Map<String, Object> props = new HashMap<String, Object>();
                 props.put("worker_id", conn.getContainer());
                 props.put("timestamp", System.currentTimeMillis());
-                props.put("count", 123);
+                props.put("requests_processed", requestsProcessed.get());
 
                 Message status = Message.Factory.create();
                 status.setApplicationProperties(new ApplicationProperties(props));
