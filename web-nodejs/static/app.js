@@ -59,7 +59,7 @@ var upstate = {
         var lines = [];
 
         for (var response of data.responses) {
-            lines.unshift("<b>" + response[0] + ":</b> " + response[1]);
+            lines.unshift(("<b>" + response[0] + ":</b> ").padEnd(30) + response[1]);
         }
 
         newContent.innerHTML = lines.join("\n");

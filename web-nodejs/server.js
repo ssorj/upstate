@@ -46,14 +46,14 @@ function send_requests() {
     if (!receiver) {
         return;
     }
-    
+
     while (sender.sendable() && requests.length > 0) {
         var message = {
             id: request_sequence++,
             reply_to: receiver.source.address,
             body: requests.shift()
         };
-        
+
         sender.send(message);
 
         console.log("WEB: Sent request '%s'", message.body);
@@ -82,34 +82,20 @@ console.log("Connected to AMQP messaging service at %s:%s", amqp_host, amqp_port
 
 // HTTP
 
-function render_responses() {
-    var elems = [];
-
-    elems.push("<ul>");
-    
-    for (var response of responses) {
-        elems.push("<li>" + response[1] + "</li>\n");
-    }
-
-    elems.push("</ul>");
-    
-    return elems.join("\n");
-}
-
 const app = express();
 
 app.use(express.static("static"));
 app.use(body_parser.json());
 
-app.post("/send-request", function (req, res) {
+app.post("/send-request", function (req, resp) {
     requests.push(req.body.text);
     send_requests();
-    
-    res.redirect("/");
+
+    resp.redirect("/");
 });
 
-app.get("/data", function (req, res) {
-    res.json({responses: responses});
+app.get("/data", function (req, resp) {
+    resp.json({responses: responses});
 });
 
 app.listen(http_port, http_host);
