@@ -281,6 +281,7 @@ section {
 
 #responses {
     width: 100%;
+    height: 16em;
 }
 
 @media screen and (max-width: 720px) {
