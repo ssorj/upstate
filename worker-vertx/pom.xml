@@ -18,12 +18,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.amqphub.upstate.spring</groupId>
-  <artifactId>upstate-worker-spring</artifactId>
+  <groupId>org.amqphub.upstate.vertx</groupId>
+  <artifactId>upstate-worker-vertx</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Upstate Spring Worker</name>
-  <description>A sample Spring app that processes requests</description>
+  <name>Upstate Vert.x Worker</name>
+  <description>A sample Vert.x app that processes requests</description>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -32,9 +32,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.amqphub.spring</groupId>
-      <artifactId>amqp-10-jms-spring-boot-starter</artifactId>
-      <version>0.4.0</version>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-proton</artifactId>
+      <version>3.5.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -46,16 +46,25 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
         <configuration>
-          <fork>true</fork>
-          <skip>false</skip>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>org.amqphub.upstate.vertx.Worker</mainClass>
+            </manifest>
+          </archive>
         </configuration>
         <executions>
           <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
             <goals>
-              <goal>repackage</goal>
+              <goal>single</goal>
             </goals>
           </execution>
         </executions>

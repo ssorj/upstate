@@ -25,6 +25,10 @@ try:
         call_and_print_on_error("make clean build")
         worker_spring = start_process("make run")
 
+    with working_dir("worker-vertx"):
+        call_and_print_on_error("make clean build")
+        worker_spring = start_process("make run")
+
     with working_dir("web-nodejs"):
         call_and_print_on_error("make clean build")
         call("make run")
@@ -34,3 +38,4 @@ except CalledProcessError:
     terminate_process(broker)
     terminate_process(worker_nodejs)
     terminate_process(worker_spring)
+    terminate_process(worker_vertx)
