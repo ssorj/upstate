@@ -29,7 +29,7 @@ import org.apache.qpid.proton.amqp.messaging.ApplicationProperties;
 import org.apache.qpid.proton.amqp.messaging.Section;
 import org.apache.qpid.proton.message.Message;
 
-public class Worker {
+public class VertxWorker {
     private static String id = "worker-vertx-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
 

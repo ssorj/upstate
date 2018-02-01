@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 @EnableJms
-public class Worker {
+public class SpringWorker {
     private static String id = "worker-spring-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
 
@@ -80,6 +80,6 @@ public class Worker {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(Worker.class, args);
+        SpringApplication.run(SpringWorker.class, args);
     }
 }

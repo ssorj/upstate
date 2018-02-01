@@ -55,7 +55,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>org.amqphub.upstate.vertx.Worker</mainClass>
+              <mainClass>org.amqphub.upstate.vertx.VertxWorker</mainClass>
             </manifest>
           </archive>
         </configuration>
