@@ -44,21 +44,21 @@ public class VertxWorker {
             Vertx vertx = Vertx.vertx();
             ProtonClient client = ProtonClient.create(vertx);
 
+            client.connect(host, port, (res) -> {
+                    if (res.failed()) {
+                        res.cause().printStackTrace();
+                        return;
+                    }
+
+                    ProtonConnection conn = res.result();
+                    conn.setContainer(id);
+                    conn.open();
+
+                    handleRequests(vertx, conn);
+                    sendStatusUpdates(vertx, conn);
+                });
+
             while (true) {
-                client.connect(host, port, (res) -> {
-                        if (res.failed()) {
-                            res.cause().printStackTrace();
-                            return;
-                        }
-
-                        ProtonConnection conn = res.result();
-                        conn.setContainer(id);
-                        conn.open();
-
-                        handleRequests(vertx, conn);
-                        sendStatusUpdates(vertx, conn);
-                    });
-
                 Thread.sleep(60 * 1000);
             }
         } catch (Exception e) {
