@@ -48,7 +48,12 @@ public class Worker {
                             return;
                         }
 
-                        handleRequests(res.result());
+                        ProtonConnection conn = res.result();
+                        conn.setContainer(id);
+                        conn.open();
+
+                        handleRequests(vertx, conn);
+                        sendStatusUpdates(vertx, conn);
                     });
 
                 Thread.sleep(60 * 1000);
@@ -59,10 +64,7 @@ public class Worker {
         }
     }
 
-    private static void handleRequests(ProtonConnection conn) {
-        conn.setContainer(id);
-        conn.open();
-
+    private static void handleRequests(Vertx vertx, ProtonConnection conn) {
         ProtonReceiver receiver = conn.createReceiver("upstate/requests");
         ProtonSender sender = conn.createSender(null);
 
@@ -100,5 +102,34 @@ public class Worker {
     private static String processRequest(Message request) {
         String requestBody = (String) ((AmqpValue) request.getBody()).getValue();
         return requestBody.toUpperCase();
+    }
+
+    private static void sendStatusUpdates(Vertx vertx, ProtonConnection conn) {
+        ProtonSender sender = conn.createSender("upstate/worker-status");
+
+        vertx.setPeriodic(10 * 1000, (timer) -> {
+                if (conn.isDisconnected()) {
+                    vertx.cancelTimer(timer);
+                    return;
+                }
+
+                if (sender.sendQueueFull()) {
+                    return;
+                }
+
+                System.out.println("WORKER-VERTX: Sending status update");
+
+                Map<String, Object> props = new HashMap<String, Object>();
+                props.put("worker_id", conn.getContainer());
+                props.put("timestamp", System.currentTimeMillis());
+                props.put("count", 123);
+
+                Message status = Message.Factory.create();
+                status.setApplicationProperties(new ApplicationProperties(props));
+
+                sender.send(status);
+            });
+
+        sender.open();
     }
 }

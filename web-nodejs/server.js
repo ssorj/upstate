@@ -34,35 +34,38 @@ const amqp_port = process.env.MESSAGING_SERVICE_PORT || 5672;
 const id = Math.floor(Math.random() * (10000 - 1000)) + 1000;
 const container = rhea.create_container({id: "web-nodejs-" + id});
 
-var sender = null;
-var receiver = null;
+var request_sender = null;
+var response_receiver = null;
+var worker_status_receiver = null;
 
 const requests = [];
 const responses = [];
+const worker_status = {};
 
 var request_sequence = 0;
 
 function send_requests() {
-    if (!receiver) {
+    if (!response_receiver) {
         return;
     }
 
-    while (sender.sendable() && requests.length > 0) {
+    while (request_sender.sendable() && requests.length > 0) {
         var message = {
             id: request_sequence++,
-            reply_to: receiver.source.address,
+            reply_to: response_receiver.source.address,
             body: requests.shift()
         };
 
-        sender.send(message);
+        request_sender.send(message);
 
         console.log("WEB: Sent request '%s'", message.body);
     }
 }
 
 container.on("connection_open", function (event) {
-    sender = event.connection.open_sender("upstate/requests");
-    receiver = event.connection.open_receiver({source: {dynamic: true}});
+    request_sender = event.connection.open_sender("upstate/requests");
+    response_receiver = event.connection.open_receiver({source: {dynamic: true}});
+    worker_status_receiver = event.connection.open_receiver("upstate/worker-status");
 });
 
 container.on("sendable", function (event) {
@@ -70,10 +73,21 @@ container.on("sendable", function (event) {
 });
 
 container.on("message", function (event) {
-    var message = event.message;
-    responses.push([message.application_properties.worker_id, message.body]);
+    if (event.receiver === worker_status_receiver) {
+        var update = event.message.application_properties;
+        console.log("WEB: Received status update from %s", update.worker_id);
+        worker_status[update.worker_id] = [update.timestamp, update.count];
+        return;
+    }
 
-    console.log("WEB: Received response '%s'", message.body);
+    if (event.receiver === response_receiver) {
+        var response = event.message;
+        console.log("WEB: Received response '%s'", response.body);
+        responses.push([response.application_properties.worker_id, response.body]);
+        return;
+    }
+
+    throw new Exception();
 });
 
 container.connect({host: amqp_host, port: amqp_port});
@@ -90,12 +104,11 @@ app.use(body_parser.json());
 app.post("/send-request", function (req, resp) {
     requests.push(req.body.text);
     send_requests();
-
     resp.redirect("/");
 });
 
 app.get("/data", function (req, resp) {
-    resp.json({responses: responses});
+    resp.json({"responses": responses, "worker_status": worker_status});
 });
 
 app.listen(http_port, http_host);

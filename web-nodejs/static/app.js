@@ -68,9 +68,32 @@ var upstate = {
         oldContent.parentNode.replaceChild(newContent, oldContent);
     },
 
+    renderWorkers: function (data) {
+        console.log("Rendering workers");
+
+        var oldContent = $("#workers");
+        var newContent = document.createElement("pre");
+
+        var lines = [];
+
+        for (var worker_id in data.worker_status) {
+            var status = data.worker_status[worker_id];
+            var timestamp = status[0];
+            var count = status[1];
+
+            lines.unshift(("<b>" + worker_id + ":</b> ").padEnd(30) + timestamp + ", " + count);
+        }
+
+        newContent.innerHTML = lines.join("\n");
+        newContent.setAttribute("id", "workers");
+
+        oldContent.parentNode.replaceChild(newContent, oldContent);
+    },
+
     init: function () {
         window.addEventListener("statechange", function (event) {
             upstate.renderResponses(upstate.data);
+            upstate.renderWorkers(upstate.data);
         });
 
         window.addEventListener("load", function (event) {
