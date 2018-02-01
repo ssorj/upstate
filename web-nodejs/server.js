@@ -40,6 +40,8 @@ var receiver = null;
 const requests = [];
 const responses = [];
 
+var request_sequence = 0;
+
 function send_requests() {
     if (!receiver) {
         return;
@@ -47,6 +49,7 @@ function send_requests() {
     
     while (sender.sendable() && requests.length > 0) {
         var message = {
+            id: request_sequence++,
             reply_to: receiver.source.address,
             body: requests.shift()
         };

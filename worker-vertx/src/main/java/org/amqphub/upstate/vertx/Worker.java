@@ -17,42 +17,87 @@
 
 package org.amqphub.upstate.vertx;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
 import io.vertx.proton.ProtonClient;
 import io.vertx.proton.ProtonConnection;
+import io.vertx.proton.ProtonReceiver;
 import io.vertx.proton.ProtonSender;
-
-//import org.apache.qpid.proton.amqp.messaging.AmqpValue;
-//import org.apache.qpid.proton.amqp.messaging.Section;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.qpid.proton.amqp.messaging.AmqpValue;
+import org.apache.qpid.proton.amqp.messaging.ApplicationProperties;
+import org.apache.qpid.proton.amqp.messaging.Section;
 import org.apache.qpid.proton.message.Message;
 
 public class Worker {
+    private static String id = "worker-vertx-" +
+        (Math.round(Math.random() * (10000 - 1000)) + 1000);
+
     public static void main(String[] args) {
-        Vertx vertx = Vertx.vertx();
-        ProtonClient client = ProtonClient.create(vertx);
+        try {
+            String host = args[0];
+            int port = Integer.parseInt(args[1]);
 
-        client.connect("localhost", 5672, (connectResult) -> {
-                checkResult(connectResult);
+            Vertx vertx = Vertx.vertx();
+            ProtonClient client = ProtonClient.create(vertx);
 
-                ProtonConnection conn = connectResult.result();
-                conn.setContainer("worker-vertx-9999");
+            client.connect(host, port, (res) -> {
+                    if (res.failed()) {
+                        throw new IllegalStateException(res.cause());
+                    }
 
-                conn.openHandler((openResult) -> {
-                        checkResult(openResult);
+                    handleRequests(res.result());
+                });
 
-                        doStuff(openResult.result());
-                    });
-            });
-    }
-
-    private static void doStuff(ProtonConnection conn) {
-        System.out.println("SUCCESS");
-    }
-
-    private static void checkResult(AsyncResult result) {
-        if (result.failed()) {
-            throw new IllegalStateException(result.cause());
+            while (true) {
+                Thread.sleep(10000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+    }
+
+    private static void handleRequests(ProtonConnection conn) {
+        conn.setContainer(id);
+        conn.open();
+
+        ProtonReceiver receiver = conn.createReceiver("upstate/requests");
+        ProtonSender sender = conn.createSender(null);
+
+        receiver.handler((delivery, request) -> {
+                String requestBody = (String) ((AmqpValue) request.getBody()).getValue();
+                System.out.println("WORKER-VERTX: Received request '" + requestBody + "'");
+
+                String responseBody;
+
+                try {
+                    responseBody = processRequest(request);
+                } catch (Exception e) {
+                    System.err.println("WORKER-VERTX: Failed processing message: " + e);
+                    return;
+                }
+
+                System.out.println("WORKER-VERTX: Sending response '" + responseBody + "'");
+
+                Map<String, String> props = new HashMap<String, String>();
+                props.put("worker_id", conn.getContainer());
+
+                Message response = Message.Factory.create();
+                response.setAddress(request.getReplyTo());
+                response.setCorrelationId(request.getMessageId());
+                response.setBody(new AmqpValue(responseBody));
+                response.setApplicationProperties(new ApplicationProperties(props));
+
+                sender.send(response);
+            });
+
+        sender.open();
+        receiver.open();
+    }
+
+    private static String processRequest(Message request) {
+        String requestBody = (String) ((AmqpValue) request.getBody()).getValue();
+        return requestBody.toUpperCase();
     }
 }

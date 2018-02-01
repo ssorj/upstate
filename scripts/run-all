@@ -27,7 +27,7 @@ try:
 
     with working_dir("worker-vertx"):
         call_and_print_on_error("make clean build")
-        worker_spring = start_process("make run")
+        worker_vertx = start_process("make run")
 
     with working_dir("web-nodejs"):
         call_and_print_on_error("make clean build")

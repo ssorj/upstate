@@ -17,7 +17,6 @@
 
 package org.amqphub.upstate.spring;
 
-import java.lang.Math;
 import javax.jms.ConnectionFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,7 +34,7 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication
 @EnableJms
 public class Worker {
-    private static String clientId = "worker-spring-" +
+    private static String id = "worker-spring-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
 
     @Bean
@@ -46,14 +45,14 @@ public class Worker {
         configurer.configure(listenerFactory, connectionFactory);
         listenerFactory.setTransactionManager(null);
         listenerFactory.setSessionTransacted(false);
-        listenerFactory.setClientId(clientId);
+        listenerFactory.setClientId(id);
         return listenerFactory;
     }
 
     @Component
     static class MessageHandler {
         @JmsListener(destination = "upstate/requests")
-        public Message<String> receiveRequest(Message<String> request) {
+        private Message<String> handleRequest(Message<String> request) {
             System.out.println("WORKER-SPRING: Received request '" + request.getPayload() + "'");
 
             String responsePayload;
@@ -69,13 +68,13 @@ public class Worker {
 
             Message<String> response = MessageBuilder.withPayload(responsePayload)
                 .setHeader(JmsHeaders.CORRELATION_ID, request.getHeaders().get(MessageHeaders.ID))
-                .setHeader("worker_id", clientId)
+                .setHeader("worker_id", id)
                 .build();
 
             return response;
         }
 
-        public String processRequest(Message<String> request) {
+        private String processRequest(Message<String> request) {
             return request.getPayload().toUpperCase();
         }
     }
