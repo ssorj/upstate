@@ -41,16 +41,17 @@ public class Worker {
             Vertx vertx = Vertx.vertx();
             ProtonClient client = ProtonClient.create(vertx);
 
-            client.connect(host, port, (res) -> {
-                    if (res.failed()) {
-                        throw new IllegalStateException(res.cause());
-                    }
-
-                    handleRequests(res.result());
-                });
-
             while (true) {
-                Thread.sleep(10000);
+                client.connect(host, port, (res) -> {
+                        if (res.failed()) {
+                            res.cause().printStackTrace();
+                            return;
+                        }
+
+                        handleRequests(res.result());
+                    });
+
+                Thread.sleep(60 * 1000);
             }
         } catch (Exception e) {
             e.printStackTrace();
