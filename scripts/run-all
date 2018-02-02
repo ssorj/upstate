@@ -12,6 +12,7 @@ set_message_threshold("debug")
 broker = None
 worker_nodejs = None
 worker_spring = None
+worker_vertx = None
 
 try:
     with working_dir("broker-python"):
