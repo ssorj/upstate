@@ -17,7 +17,11 @@
 
 package org.amqphub.upstate.spring;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -25,17 +29,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 @EnableJms
+@EnableScheduling
 public class SpringWorker {
     private static String id = "worker-spring-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
+
+    private static AtomicInteger requestsProcessed = new AtomicInteger(0);
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory
@@ -71,11 +82,34 @@ public class SpringWorker {
                 .setHeader("worker_id", id)
                 .build();
 
+            requestsProcessed.incrementAndGet();
+
             return response;
         }
 
         private String processRequest(Message<String> request) {
             return request.getPayload().toUpperCase();
+        }
+    }
+
+    @Component
+    static class ScheduledTask {
+        @Autowired
+        private JmsTemplate jmsTemplate;
+
+        @Scheduled(fixedRate = 10 * 1000)
+        private void sendStatusUpdate() {
+            System.out.println("WORKER-SPRING: Sending status update");
+
+            jmsTemplate.send("upstate/worker-status", new MessageCreator() {
+                    public javax.jms.Message createMessage(Session session) throws JMSException {
+                        javax.jms.Message message = session.createTextMessage();
+                        message.setStringProperty("worker_id", id);
+                        message.setLongProperty("timestamp", System.currentTimeMillis());
+                        message.setLongProperty("requests_processed", requestsProcessed.get());
+                        return message;
+                    }
+                });
         }
     }
 
