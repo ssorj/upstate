@@ -108,7 +108,7 @@ app.post("/send-request", function (req, resp) {
 });
 
 app.get("/data", function (req, resp) {
-    resp.json({"responses": responses, "worker_status": worker_status});
+    resp.json({responses: responses, worker_status: worker_status});
 });
 
 app.listen(http_port, http_host);

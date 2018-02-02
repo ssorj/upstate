@@ -112,7 +112,7 @@ public class VertxWorker {
     private static void sendStatusUpdates(Vertx vertx, ProtonConnection conn) {
         ProtonSender sender = conn.createSender("upstate/worker-status");
 
-        vertx.setPeriodic(10 * 1000, (timer) -> {
+        vertx.setPeriodic(5 * 1000, (timer) -> {
                 if (conn.isDisconnected()) {
                     vertx.cancelTimer(timer);
                     return;

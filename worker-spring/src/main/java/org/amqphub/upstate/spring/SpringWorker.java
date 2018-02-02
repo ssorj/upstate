@@ -97,7 +97,7 @@ public class SpringWorker {
         @Autowired
         private JmsTemplate jmsTemplate;
 
-        @Scheduled(fixedRate = 10 * 1000)
+        @Scheduled(fixedRate = 5 * 1000)
         private void sendStatusUpdate() {
             System.out.println("WORKER-SPRING: Sending status update");
 

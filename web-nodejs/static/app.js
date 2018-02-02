@@ -57,7 +57,7 @@ var upstate = {
         var newContent = document.createElement("pre");
 
         var lines = [];
-        
+
         for (var response of data.responses) {
             lines.unshift(("<b>" + response[0] + ":</b> ").padEnd(30) + response[1]);
         }
