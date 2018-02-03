@@ -1,14 +1,3 @@
 #!/bin/bash
 
-set -ex
-
-if [[ -z $MESSAGING_SERVICE_HOST ]]; then
-   MESSAGING_SERVICE_HOST=localhost
-fi
-
-if [[ -z $MESSAGING_SERVICE_PORT ]]; then
-   MESSAGING_SERVICE_PORT=5672
-fi
-
-exec java -jar target/upstate-worker-vertx-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
-     $MESSAGING_SERVICE_HOST $MESSAGING_SERVICE_PORT 
+exec java -jar target/upstate-worker-vertx-1.0.0-SNAPSHOT-jar-with-dependencies.jar

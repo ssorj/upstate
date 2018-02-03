@@ -43,6 +43,22 @@ import org.springframework.stereotype.Component;
 @EnableJms
 @EnableScheduling
 public class SpringWorker {
+    static {
+        String host = System.getenv("MESSAGING_SERVICE_HOST");
+        String port = System.getenv("MESSAGING_SERVICE_PORT");
+
+        if (host == null) {
+            host = "localhost";
+        }
+
+        if (port == null) {
+            port = "5672";
+        }
+
+        System.setProperty("amqphub.amqp10jms.receive-local-only", "true");
+        System.setProperty("amqphub.amqp10jms.remote-url", "amqp://" + host + ":" + port);
+    }
+
     private static String id = "worker-spring-" +
         (Math.round(Math.random() * (10000 - 1000)) + 1000);
 

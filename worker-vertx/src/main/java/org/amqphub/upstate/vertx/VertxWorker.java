@@ -38,8 +38,18 @@ public class VertxWorker {
 
     public static void main(String[] args) {
         try {
-            String host = args[0];
-            int port = Integer.parseInt(args[1]);
+            String host = System.getenv("MESSAGING_SERVICE_HOST");
+            String portString = System.getenv("MESSAGING_SERVICE_PORT");
+
+            if (host == null) {
+                host = "localhost";
+            }
+
+            if (portString == null) {
+                portString = "5672";
+            }
+
+            int port = Integer.parseInt(portString);
 
             Vertx vertx = Vertx.vertx();
             ProtonClient client = ProtonClient.create(vertx);
