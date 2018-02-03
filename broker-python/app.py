@@ -42,7 +42,7 @@ class BrokerCommand:
         try:
             self.host = _os.environ["MESSAGING_SERVICE_HOST"]
         except KeyError:
-            self.host = "127.0.0.1"
+            self.host = "0.0.0.0"
 
         try:
             self.port = _os.environ["MESSAGING_SERVICE_PORT"]
