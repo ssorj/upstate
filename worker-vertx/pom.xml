@@ -46,6 +46,18 @@
   <build>
     <plugins>
       <plugin>
+        <!-- Prevent creation of the default jar.  It breaks the
+             OpenShift Java S2I logic for finding and executing the
+             app. -->
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.6</version>

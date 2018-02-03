@@ -8,4 +8,4 @@ clean:
 
 .PHONY: run
 run:
-	scripts/run
+	java -jar target/upstate-worker-spring-1.0.0-SNAPSHOT.jar
