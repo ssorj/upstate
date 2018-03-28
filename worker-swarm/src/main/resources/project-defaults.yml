@@ -1,0 +1,28 @@
+swarm:
+  deployment:
+    org.jboss.genericjms:generic-jms-ra.rar:
+  resource-adapters:
+    resource-adapters:
+      generic-jms:
+        archive: generic-jms-ra.rar
+        transaction-support: NoTransaction
+        connection-definitions:
+          connectionFactory:
+            class-name: org.jboss.resource.adapter.jms.JmsManagedConnectionFactory
+            jndi-name: java:global/connectionFactory
+            config-properties:
+              JndiParameters: java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;java.naming.provider.url=amqp://localhost:5672
+              ConnectionFactory: ConnectionFactory
+        admin-objects:
+          /upstate/requests:
+            class-name: javax.jms.Queue
+            jndi-name: /upstate/requests
+            use-java-context: false
+  ejb3:
+    default-resource-adapter-name: generic-jms
+  logging:
+    loggers:
+      org.jboss:
+        level: DEBUG
+      org.wildfly:
+        level: DEBUG
