@@ -20,6 +20,8 @@ package org.amqphub.upstate.swarm;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -31,6 +33,7 @@ import javax.jms.TextMessage;
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "jndiParameters", propertyValue = "java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;connectionFactory.factory1=amqp://localhost:5672;queue.queue1=upstate/requests"),
     })
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class SwarmWorker implements MessageListener {
     public void onMessage(Message rcvMessage) {
         System.err.println("onMessage!");
