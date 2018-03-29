@@ -50,11 +50,12 @@
     </dependency>
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
-      <artifactId>messaging</artifactId>
+      <artifactId>ejb</artifactId>
     </dependency>
+    <!-- I don't think I should need this, but I do -->
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
-      <artifactId>ejb</artifactId>
+      <artifactId>messaging</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.genericjms</groupId>
@@ -66,6 +67,12 @@
       <groupId>org.apache.qpid</groupId>
       <artifactId>qpid-jms-client</artifactId>
       <version>0.31.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

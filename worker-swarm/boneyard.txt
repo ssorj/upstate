@@ -12,11 +12,11 @@ swarm:
             jndi-name: java:global/connection-factory-1
             config-properties:
               JndiParameters: java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory
-              ConnectionFactory: connectionFactory
-        admin-objects:
-          upstateRequests:
-            class-name: javax.jms.Queue
-            jndi-name: java:global/upstate/requests
+              ConnectionFactory: ConnectionFactory
+        # admin-objects:
+        #   java:global/upstate/requests:
+        #     class-name: javax.jms.Queue
+        #     jndi-name: java:global/upstate/requests
   ejb3:
     default-resource-adapter-name: resource-adapter-1
   logging:
@@ -27,3 +27,10 @@ swarm:
         level: TRACE
       org.wildfly:
         level: INFO
+  # naming:
+  #   bindings:
+  #     java:global/upstate/requests:
+  #        value: 100
+  #        type: int
+  #        binding-type: simple
+

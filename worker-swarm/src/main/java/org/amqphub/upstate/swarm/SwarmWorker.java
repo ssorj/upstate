@@ -26,23 +26,12 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = "connectionFactory", propertyValue = "java:global/connectionFactory"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "/upstate/requests"),
+        @ActivationConfigProperty(propertyName = "connectionFactory", propertyValue = "java:global/connection-factory-1"),
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "java:global/upstate/requests"),
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
     })
 public class SwarmWorker implements MessageListener {
     public void onMessage(Message rcvMessage) {
         System.err.println("onMessage!");
-        TextMessage msg = null;
-        try {
-            if (rcvMessage instanceof TextMessage) {
-                msg = (TextMessage) rcvMessage;
-                System.err.println("Received Message from queue: " + msg.getText());
-            } else {
-                System.err.println("Message of wrong type: " + rcvMessage.getClass().getName());
-            }
-        } catch (JMSException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
