@@ -34,3 +34,23 @@ swarm:
   #        type: int
   #        binding-type: simple
 
+---
+
+        connection-definitions:
+          connection-factory-1:
+            class-name: org.jboss.resource.adapter.jms.JmsManagedConnectionFactory
+            jndi-name: java:global/connection-factory-1
+            config-properties:
+              JndiParameters: java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;connectionFactory.factory1=amqp://localhost:5672;queue.queue1=upstate/requests
+              ConnectionFactory: factory1
+        admin-objects:
+          queue1:
+            class-name: javax.jms.Queue
+            jndi-name: java:global/upstate/requests
+
+---
+
+        # connection-definitions:
+        #   connection-factory-1:
+        #     class-name: org.jboss.resource.adapter.jms.JmsManagedConnectionFactory
+        #     jndi-name: java:global/connection-factory-1

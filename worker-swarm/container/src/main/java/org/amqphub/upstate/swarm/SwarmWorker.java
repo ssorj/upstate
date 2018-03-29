@@ -26,9 +26,10 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = "connectionFactory", propertyValue = "java:global/connection-factory-1"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "java:global/upstate/requests"),
+        @ActivationConfigProperty(propertyName = "connectionFactory", propertyValue = "factory1"),
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue1"),
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+        @ActivationConfigProperty(propertyName = "jndiParameters", propertyValue = "java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;connectionFactory.factory1=amqp://localhost:5672;queue.queue1=upstate/requests"),
     })
 public class SwarmWorker implements MessageListener {
     public void onMessage(Message rcvMessage) {
