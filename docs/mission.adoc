@@ -1,10 +1,11 @@
-= Mission Name
+= Shared Work Queue
+
 :toc:
 
 [options="header"]
 |=== 
-|ID | Short Name
-|`200` | `shared-work-queue`
+| ID | Short Name
+| `200` | `shared-work-queue`
 |===
 
 == Description
@@ -33,11 +34,16 @@ The mission covers:
 _A short, high-level description of the intended purpose that could be
 achieved as part of the mission_
 
-* A user has a large number of discrete tasks that require processing.
-* A user wants to be able to add worker resources on demand as the number of outstanding tasks grow.
-* But she does not want the requesting process to have to know about each worker.
-* A well defined shared resource for adding work and consuming it allows this.
-* A message queue is a natural way to define such a resource.
+The user has a large number of discrete tasks that require processing.
+To make sure they are processed in a certain amount of time, the user
+wants to be able to add worker processes on demand as the number of
+outstanding tasks grow.
+
+One could achieve this by telling every requesting process about every
+worker process, but that requires updating many potential requesters.
+Instead, the user wants to design the system so that the requester
+does not need to know how many workers there are, and the workers do
+not need to know which process the request came from.
 
 == Concepts and Architectural Patterns
 
