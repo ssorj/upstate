@@ -1,4 +1,4 @@
-= Shared Work Queue
+= Scalable Task Processing using a Shared Work Queue
 
 :toc:
 
@@ -30,9 +30,6 @@ The mission covers:
 * Monitoring the status of the worker processes
 
 == User Problem
-
-_A short, high-level description of the intended purpose that could be
-achieved as part of the mission_
 
 The user has a large number of discrete tasks that require processing.
 To make sure they are processed in a certain amount of time, the user
