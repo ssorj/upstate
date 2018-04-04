@@ -1,0 +1,118 @@
+= Mission Name
+:toc:
+
+[options="header"]
+|=== 
+|ID | Short Name
+|`200` | `shared-work-queue`
+|===
+
+== Description
+
+This mission demonstrates how to dispatch tasks to a scalable set of
+worker processes using a message queue.  It uses the AMQP 1.0 message
+protocol to send and receive messages.  The workers are implemented in
+a variety of different languages and application runtimes.
+
+Having a single, well known shared resource for adding and consuming
+work makes it easier to scale the number of workers up or down.  The
+frontend process does not need to know any of the details of the
+backend workers.  The use of a standard messaging protocol enables
+frontends and workers written in any language to interoperate.
+
+The mission covers:
+
+* Sending work requests to a common work queue
+* Receiving and processing work requests as they come in
+* Sending the processed result back to the requesting process
+* Adding new workers as demand increases or removing workers as it dies down
+* Monitoring the status of the worker processes
+
+== User Problem
+
+_A short, high-level description of the intended purpose that could be
+achieved as part of the mission_
+
+* A user has a large number of discrete tasks that require processing.
+* A user wants to be able to add worker resources on demand as the number of outstanding tasks grow.
+* But she does not want the requesting process to have to know about each worker.
+* A well defined shared resource for adding work and consuming it allows this.
+* A message queue is a natural way to define such a resource.
+
+== Concepts and Architectural Patterns
+
+_A list of concepts, technologies and patterns applied or implemented
+in the mission. Should be formatted as a bulleted list._
+
+* High level
+** Send request messages and receive response messages
+** Periodically send notification messages
+** Scale backend workers up and down
+
+
+* Low level
+** Each worker sends the result of a task directly to the requesting frontend process using a private reply queue.
+
+== Prerequisites
+
+* The user has access to an OpenShift instance and is logged in.
+
+* The user has selected a project in which the frontend and backend
+  processes will be deployed.
+
+* The user's project has an instance of AMQ Broker installed and
+  running.  The backend and frontend processes have permission to
+  connect to the broker.
+
+* The broker has a queue named `upstate/requests`.  The frontend and
+  backend processes can send and receive messages there.
+
+* The broker has a topic named `upstate/worker-status`.  The frontend
+  and backend processes can send and receive messages there.
+
+== Use Case
+
+_A detailed description of the use case, including CLI command
+examples_
+
+== Acceptance Criteria
+
+=== Vert.x-specific Acceptance Criteria
+
+XXX
+
+=== Swarm-specific Acceptance Criteria
+
+XXX
+
+=== Boot-specific Acceptance Criteria
+
+XXX
+
+=== Node.js Acceptance Criteria
+
+XXX
+
+== Integration Requirements
+
+== Tags
+
+== Notes
+
+Demo code - <https://github.com/ssorj/upstate>
+
+== Approval
+|=======
+|PM|https://github.com/<username>[Name]|&#x2611;
+|DevExp|https://github.com/<username>[Name]|&#x2611;
+|Vert.x|https://github.com/<usernname>[Name]|&#x2611;
+|WildFly Swarm|https://github.com/<username>[Name]|&#x2611;
+|Spring Boot|https://github.com/<username>[Name]|&#x2611;
+|Node.js|https://github.com/<username>[Name]|&#x2611;
+|QE|https://github.com/<username>[Name]|&#x2611;
+|Docs|https://github.com/<username>[Name]|&#x2611;
+|Architect|https://github.com/<username>[Name]|&#x2610;
+|=======
+
+// unchecked = &#x2610;
+// checked = &#x2611;
