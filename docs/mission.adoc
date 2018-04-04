@@ -1,4 +1,4 @@
-= Scalable Task Processing using a Shared Work Queue
+= Scalable Task Processing Using a Shared Work Queue
 
 :toc:
 
@@ -16,7 +16,7 @@ protocol to send and receive messages.  The workers are implemented in
 a variety of different languages and application runtimes.
 
 Having a single, well known shared resource for adding and consuming
-work makes it easier to scale the number of workers up or down.  The
+work makes it easier to scale the number of workers up and down.  The
 frontend process does not need to know any of the details of the
 backend workers.  The use of a standard messaging protocol enables
 frontends and workers written in any language to interoperate.
@@ -32,7 +32,7 @@ The mission covers:
 == User Problem
 
 The user has a large number of discrete tasks that require processing.
-To make sure they are processed in a certain amount of time, the user
+To make sure they are processed with satisfactory speed, the user
 wants to be able to add worker processes on demand as the number of
 outstanding tasks grow.
 
@@ -44,17 +44,24 @@ not need to know which process the request came from.
 
 == Concepts and Architectural Patterns
 
-_A list of concepts, technologies and patterns applied or implemented
-in the mission. Should be formatted as a bulleted list._
+* Sending and receiving messages.  The application uses the AMQP
+  message protocol to communicate using queues and topics on a message
+  server.
 
-* High level
-** Send request messages and receive response messages
-** Periodically send notification messages
-** Scale backend workers up and down
+* Sending request messages and receiving response messages.  The
+  application demonstrates how the request-response messaging pattern
+  is implemented in AMQP.
 
+* Periodically sending broadcast updates.  The application
+  demonstrates use of the publish-subscribe messaging pattern for
+  distributing information to multiple consumers.
 
-* Low level
-** Each worker sends the result of a task directly to the requesting frontend process using a private reply queue.
+* Maintaining connections between services.  The frontend and backend
+  components reconnect to the message server if the connection is
+  lost.
+
+* Scaling backend workers up and down.  The operator can freely add
+  and remove backend workers.
 
 == Prerequisites
 
@@ -75,10 +82,28 @@ in the mission. Should be formatted as a bulleted list._
 
 == Use Case
 
-_A detailed description of the use case, including CLI command
-examples_
+This mission demonstrates a distributed messaging application.  It
+contains multiple components that communicate using a messaging
+server.
+
+The frontend, a web server in this case, registers requests to perform
+work by sending a request message to a well known queue.  A backend
+worker then fetches the work request from the queue and performs the
+work.
+
+When the frontend creates the request message, it also establishes a
+dedicated queue for responses.  It includes the server-generated
+address of this queue in its request.  After processing the work, the
+backend worker sends the result as a response to the pre-established
+response queue.
+
+XXX
+
+// Scaling the number of workers
 
 == Acceptance Criteria
+
+XXX
 
 === Vert.x-specific Acceptance Criteria
 
