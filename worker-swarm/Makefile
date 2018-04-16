@@ -5,7 +5,7 @@ build:
 .PHONY: clean
 clean:
 	mvn clean
-	rm audit.log
+	rm -f audit.log
 
 .PHONY: run
 run:
