@@ -62,22 +62,6 @@
       <version>2.0.2.Final-SNAPSHOT</version>
       <type>rar</type>
     </dependency>
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-jms-client</artifactId>
-      <version>0.31.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
-      <version>1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.7.25</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -94,17 +78,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- <plugin> -->
-      <!--   <groupId>org.apache.maven.plugins</groupId> -->
-      <!--   <artifactId>maven-jar-plugin</artifactId> -->
-      <!--   <configuration> -->
-      <!--     <archive> -->
-      <!--       <manifestEntries> -->
-      <!--         <dependencies>deployment.qpid-jms-client.jar, deployment.generic-jms-ra.rar</dependencies> -->
-      <!--       </manifestEntries> -->
-      <!--     </archive> -->
-      <!--   </configuration> -->
-      <!-- </plugin> -->
     </plugins>
   </build>
 </project>

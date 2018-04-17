@@ -1,6 +1,5 @@
 swarm:
   deployment:
-    org.apache.qpid:qpid-jms-client.jar:
     org.jboss.genericjms:generic-jms-ra.rar:
   resource-adapters:
     resource-adapters:

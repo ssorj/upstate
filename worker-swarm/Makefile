@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	mvn package
+	mvn install
 
 .PHONY: clean
 clean:
