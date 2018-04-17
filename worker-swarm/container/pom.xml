@@ -61,13 +61,21 @@
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>messaging</artifactId>
     </dependency>
-    <!--
+    <!-- These are two failed attempts to supply the deps without adding Artemis -->
+<!--
+    <dependency>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
+      <version>1.0.2.Final</version>
+      </dependency>
+-->
+<!--
     <dependency>
       <groupId>org.jboss.javaee</groupId>
       <artifactId>jboss-jms-api</artifactId>
       <version>1.1.0.GA</version>
     </dependency>
-    -->
+-->
     <dependency>
       <groupId>org.amqphub.upstate.swarm</groupId>
       <artifactId>qpid-jms-ra</artifactId>
