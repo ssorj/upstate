@@ -10,7 +10,7 @@ we create our own RAR with additional dependencies for Qpid JMS.
 
 The `qpid-jms-ra` module consists of two files.
 
-* [qpid-jms-ra/src/main/rar/META-INF/ra.xml](qpid-jms-ra/src/main/rar/META-INF/ra.xml)> -
+* [qpid-jms-ra/src/main/rar/META-INF/ra.xml](qpid-jms-ra/src/main/rar/META-INF/ra.xml) -
   This is taken unaltered from the generic JMS RA RAR module.
 
 * [qpid-jms-ra/pom.xml](qpid-jms-ra/pom.xml) -
