@@ -8,6 +8,7 @@
     </parent>
 
     <artifactId>generic-jms-ra</artifactId>
+    <!-- Deployment in Swarm requires this be *jar* packaging -->
     <packaging>jar</packaging>
     <name>JBoss Generic JMS RA RAR</name>
 

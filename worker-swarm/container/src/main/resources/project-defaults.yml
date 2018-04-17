@@ -1,5 +1,6 @@
 swarm:
   deployment:
+    # Despite the fact the RA is packaged as a jar, the extension here must be ".rar"
     org.jboss.genericjms:generic-jms-ra.rar:
   resource-adapters:
     resource-adapters:
