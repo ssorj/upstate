@@ -1,1 +1,1 @@
-# Upstate Worker Node.js
+# Upstate worker - Node.js
