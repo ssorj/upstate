@@ -10,9 +10,5 @@ swarm:
     default-resource-adapter-name: qpid-jms-ra
   logging:
     loggers:
-      org.jboss:
-        level: INFO
       org.jboss.resource.adapter:
         level: TRACE
-      org.wildfly:
-        level: INFO
