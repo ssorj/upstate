@@ -9,4 +9,4 @@ clean:
 
 .PHONY: run
 run:
-	java -jar container/target/upstate-worker-swarm-1.0.0-SNAPSHOT-swarm.jar
+	java -jar container/target/upstate-worker-swarm-container-1.0.0-SNAPSHOT-swarm.jar

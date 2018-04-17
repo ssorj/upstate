@@ -18,11 +18,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.amqphub.upstate.swarm</groupId>
-  <artifactId>upstate-worker-swarm</artifactId>
+  <parent>
+    <groupId>org.amqphub.upstate.swarm</groupId>
+    <artifactId>upstate-swarm-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>upstate-worker-swarm-container</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Upstate WildFly Swarm container</name>
+  <name>Upstate WildFly Swarm worker container</name>
 
   <properties>
     <version.wildfly.swarm>2018.3.3</version.wildfly.swarm>
@@ -56,16 +61,18 @@
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>messaging</artifactId>
     </dependency>
+    <!--
+    <dependency>
+      <groupId>org.jboss.javaee</groupId>
+      <artifactId>jboss-jms-api</artifactId>
+      <version>1.1.0.GA</version>
+    </dependency>
+    -->
     <dependency>
       <groupId>org.amqphub.upstate.swarm</groupId>
       <artifactId>qpid-jms-ra</artifactId>
       <version>1.0.0-SNAPSHOT</version>
       <type>rar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-jms-client</artifactId>
-      <version>0.31.0</version>
     </dependency>
   </dependencies>
 
