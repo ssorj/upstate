@@ -26,7 +26,8 @@
   <description>A sample WildFly Swarm app that processes requests</description>
 
   <modules>
-    <module>resource-adapter</module>
+    <module>generic-jms-ra</module>
+    <module>qpid-jms-ra</module>
     <module>container</module>
   </modules>
 </project>
