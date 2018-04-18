@@ -103,7 +103,7 @@ public class SpringWorker {
             return response;
         }
 
-        private String processRequest(Message<String> request) {
+        private String processRequest(Message<String> request) throws Exception {
             return request.getPayload().toUpperCase();
         }
     }

@@ -114,7 +114,7 @@ public class VertxWorker {
         receiver.open();
     }
 
-    private static String processRequest(Message request) {
+    private static String processRequest(Message request) throws Exception {
         String requestBody = (String) ((AmqpValue) request.getBody()).getValue();
         return requestBody.toUpperCase();
     }
