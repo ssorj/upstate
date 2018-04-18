@@ -17,15 +17,26 @@
 
 package org.amqphub.upstate.swarm;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.ejb.Schedule;
+import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "connectionFactory", propertyValue = "factory1"),
@@ -34,8 +45,100 @@ import javax.jms.TextMessage;
         @ActivationConfigProperty(propertyName = "jndiParameters", propertyValue = "java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;connectionFactory.factory1=amqp://localhost:5672;queue.queue1=upstate/requests"),
     })
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+//@Singleton
 public class SwarmWorker implements MessageListener {
-    public void onMessage(Message rcvMessage) {
-        System.err.println("onMessage!");
+    private static String id = "worker-swarm-" +
+        (Math.round(Math.random() * (10000 - 1000)) + 1000);
+
+    private static AtomicInteger requestsProcessed = new AtomicInteger(0);
+
+    public void onMessage(Message message) {
+        TextMessage request = (TextMessage) message;
+
+        try {
+            System.out.println("WORKER-SWARM: Received request '" + request.getText() + "'");
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        String responseBody;
+
+        try {
+            responseBody = processRequest(request);
+        } catch (Exception e) {
+            System.err.println("WORKER-SWARM: Failed processing message: " + e);
+            return;
+        }
+
+        System.out.println("WORKER-SWARM: Sending response '" + responseBody + "'");
+
+        ConnectionFactory factory = lookupConnectionFactory();
+
+        try {
+            Connection conn = factory.createConnection();
+
+            try {
+                Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                MessageProducer producer = session.createProducer(null);
+
+                TextMessage response = session.createTextMessage(responseBody);
+                response.setJMSCorrelationID(request.getJMSMessageID());
+                response.setStringProperty("worker_id", id);
+
+                producer.send(request.getJMSReplyTo(), response);
+            } finally {
+                conn.close();
+            }
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        requestsProcessed.incrementAndGet();
+    }
+
+    private String processRequest(TextMessage request) throws Exception {
+        return request.getText().toUpperCase();
+    }
+
+    @Schedule(second = "*/5", minute = "*", hour = "*", persistent = false)
+    public void sendStatusUpdate() {
+        System.out.println("WORKER-SWARM: Sending status update");
+
+        ConnectionFactory factory = lookupConnectionFactory();
+
+        try {
+            Connection conn = factory.createConnection();
+
+            try {
+                Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Topic topic = session.createTopic("upstate/worker-status");
+                MessageProducer producer = session.createProducer(topic);
+
+                Message message = session.createTextMessage();
+                message.setStringProperty("worker_id", id);
+                message.setLongProperty("timestamp", System.currentTimeMillis());
+                message.setLongProperty("requests_processed", requestsProcessed.get());
+
+                producer.send(message);
+            } finally {
+                conn.close();
+            }
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ConnectionFactory lookupConnectionFactory() {
+        try {
+            InitialContext context = new InitialContext();
+
+            try {
+                return (ConnectionFactory) context.lookup("java:global/jms/default");
+            } finally {
+                context.close();
+            }
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

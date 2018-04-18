@@ -6,9 +6,14 @@ swarm:
       qpid-jms-ra:
         archive: qpid-jms-ra.rar
         transaction-support: NoTransaction
+        connection-definitions:
+          default:
+            jndi-name: java:global/jms/default
+            class-name: org.jboss.resource.adapter.jms.JmsManagedConnectionFactory
+            config-properties:
+              JndiParameters:
+                value: java.naming.factory.initial=org.apache.qpid.jms.jndi.JmsInitialContextFactory;connectionFactory.factory1=amqp://localhost:5672
+              ConnectionFactory:
+                value: factory1
   ejb3:
     default-resource-adapter-name: qpid-jms-ra
-  logging:
-    loggers:
-      org.jboss.resource.adapter:
-        level: TRACE
