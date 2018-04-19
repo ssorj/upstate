@@ -12,6 +12,7 @@ set_message_threshold("debug")
 broker = None
 worker_nodejs = None
 worker_spring = None
+worker_swarm = None
 worker_vertx = None
 
 try:
@@ -26,6 +27,10 @@ try:
         call_and_print_on_error("make clean build")
         worker_spring = start_process("make run")
 
+    with working_dir("worker-swarm"):
+        call_and_print_on_error("make clean build")
+        worker_swarm = start_process("make run")
+
     with working_dir("worker-vertx"):
         call_and_print_on_error("make clean build")
         worker_vertx = start_process("make run")
@@ -39,4 +44,5 @@ except CalledProcessError:
     terminate_process(broker)
     terminate_process(worker_nodejs)
     terminate_process(worker_spring)
+    terminate_process(worker_swarm)
     terminate_process(worker_vertx)
