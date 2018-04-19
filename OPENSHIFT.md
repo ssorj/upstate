@@ -82,6 +82,23 @@
 9. Click **Create**.
 10. [Use the shared config map.](#use-the-shared-config-map)
 
+## Deploy the Swarm worker
+
+1. Click **Add to Project** and then **Browse Catalog**.
+2. Select the **Red Hat OpenJDK 8** builder from the catalog.
+3. Click **Next** to go to the configuration step.
+4. Click **advanced options**.
+5. Set **Name** to `worker-swarm`.
+6. Set **Git Repository URL** to `https://github.com/ssorj/upstate.git`.
+7. Set **Context Dir** to `worker-swarm`.
+8. Disable the **Create a route to the application** option.
+9. Click **Create**.
+10. [Use the shared config map.](#use-the-shared-config-map)
+11. Click **Builds**.
+12. Select the `worker-swarm` build.
+13. Go to the **Environment** tab.
+14. Set the `MAVEN_ARGS` variable to `-Dmaven.repo.local=/tmp/artifacts/m2 -s /tmp/artifacts/configuration/settings.xml -e -Popenshift -DskipTests -Dcom.redhat.xpaas.repo.redhatga -Dfabric8.skip=true install -Djava.net.preferIPv4Stack=true`.  This changes the Maven goal from package to install so the locally built resource adapter is available in the local Maven repo.
+
 ## Use the shared config map
 
 1. Go to the project overview and find the deployment you want to
