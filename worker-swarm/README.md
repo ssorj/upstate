@@ -2,8 +2,8 @@
 
 ## Modules
 
-The `qpid-jms-ra` serves as the JMS resource adapter for an external
-AMQP message server.  It consists of two files.
+The `qpid-jms-ra` module serves as the JMS resource adapter for an
+external AMQP message server.  It consists of two files.
 
 * [qpid-jms-ra/src/main/rar/META-INF/ra.xml](qpid-jms-ra/src/main/rar/META-INF/ra.xml) -
   This is taken unaltered from the
