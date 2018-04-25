@@ -25,8 +25,20 @@
   <name>Upstate WildFly Swarm worker parent</name>
   <description>A sample WildFly Swarm app that processes requests</description>
 
+  <repositories>
+    <repository>
+      <id>jboss-public-repository</id>
+      <url>https://repository.jboss.org/nexus/content/repositories/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <modules>
-    <module>generic-jms-ra</module>
     <module>qpid-jms-ra</module>
     <module>container</module>
   </modules>
