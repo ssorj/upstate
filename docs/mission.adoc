@@ -133,7 +133,7 @@ Demo code - <https://github.com/ssorj/upstate>
 |=======
 |PM|https://github.com/<username>[Name]|&#x2611;
 |DevExp|https://github.com/<username>[Name]|&#x2611;
-|Vert.x|https://github.com/<usernname>[Name]|&#x2611;
+|Vert.x|Clement|&#x2611;
 |WildFly Swarm|https://github.com/<username>[Name]|&#x2611;
 |Spring Boot|https://github.com/<username>[Name]|&#x2611;
 |Node.js|https://github.com/<username>[Name]|&#x2611;
