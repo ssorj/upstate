@@ -5,7 +5,7 @@
 [options="header"]
 |=== 
 | ID | Short Name
-| `200` | `shared-work-queue`
+| `200` | `messaging-work-queue`
 |===
 
 == Description
@@ -34,7 +34,7 @@ The mission covers:
 The user has a large number of discrete tasks that require processing.
 To make sure they are processed with satisfactory speed, the user
 wants to be able to add worker processes on demand as the number of
-outstanding tasks grow.
+outstanding tasks grows.
 
 One could achieve this by telling every requesting process about every
 worker process, but that requires updating many potential requesters.
@@ -113,7 +113,7 @@ XXX
 
 XXX
 
-=== Boot-specific Acceptance Criteria
+=== Spring Boot-specific Acceptance Criteria
 
 XXX
 
