@@ -142,17 +142,17 @@ oc new-app --template=<runtime>-messaging-work-queue-worker
 
 . In the OpenShift console, increase the number of worker pods to two.
 
-. In the frontend web UI, note the presence of two workers under
-  *Workers*.
+. In the frontend web interface, note the presence of two workers
+  under *Workers*.
 
 . Submit multiple requests.
 
-. See responses returned from both workers.
+. See responses returned from each worker in turn.
 
 == Acceptance Criteria
 
-An HTTP request to `http://<frontend>/api/send-request` with the JSON
-payload `{"text": "abc"}` succeeds.  Subsequent requests to
+An HTTP POST to `http://<frontend>/api/send-request` with the JSON
+payload `{"text": "abc"}` succeeds.  Subsequent GET requests to
 `http://<frontend>/api/data` contain the JSON
 `{"responses":[{"workerId":"<id>","text": "ABC"}]}`.
 
@@ -170,7 +170,13 @@ payload `{"text": "abc"}` succeeds.  Subsequent requests to
 
 == Notes
 
-Demo code - <https://github.com/ssorj/upstate>
+Node.js booster - <https://github.com/ssorj/nodejs-messaging-work-queue>
+
+Spring Boot booster - <https://github.com/gytis/spring-boot-messaging-booster>
+
+WildFly Swarm booster - <https://github.com/ssorj/wfswarm-messaging-work-queue>
+
+Vert.x booster - <https://github.com/ssorj/vertx-messaging-work-queue-booster>
 
 == Approval
 
