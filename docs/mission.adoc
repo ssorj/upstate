@@ -44,6 +44,19 @@ not need to know which process the request came from.
 
 == Concepts and Architectural Patterns
 
+This mission demonstrates a distributed messaging application.  It
+contains multiple components that communicate using a messaging
+server.
+
+The frontend, a web server, registers requests to perform work by
+sending a request message to a well known queue.  A backend worker
+then fetches the work request from the queue and performs the work.
+
+When the frontend creates the request message, it also establishes a
+queue for responses.  It includes the address of this queue in its
+request.  After processing the work, the backend worker sends the
+result as a response to the pre-established response queue.
+
 * Sending and receiving messages.  The application uses the AMQP
   message protocol to communicate using queues and topics on a message
   server.
@@ -72,29 +85,19 @@ not need to know which process the request came from.
 
 == Use Case
 
-This mission demonstrates a distributed messaging application.  It
-contains multiple components that communicate using a messaging
-server.
+=== Deployment
 
-The frontend, a web server in this case, registers requests to perform
-work by sending a request message to a well known queue.  A backend
-worker then fetches the work request from the queue and performs the
-work.
-
-When the frontend creates the request message, it also establishes a
-dedicated queue for responses.  It includes the server-generated
-address of this queue in its request.  After processing the work, the
-backend worker sends the result as a response to the pre-established
-response queue.
-
-. Apply the OpenShift templates.
+. Apply the OpenShift templates to your current project.  The
+  templates create OpenShift entities that are used in subsequent
+  steps.
 +
 [source, shell]
 ----
 oc apply -f templates/
 ----
 
-. Create the broker application.
+. Create the broker application.  This command configures and deploys
+  the broker.
 +
 [source, shell]
 ----
@@ -108,41 +111,58 @@ oc new-app --template=amq63-basic \
   -p MQ_PASSWORD=work-queue
 ----
 
-. Create a frontend application.
+. Create the frontend application.  This command builds and deploys
+  the frontend web server.
++
+Replace `<runtime>` with your chosen runtime.  The options are
+`nodejs`, `spring-boot`, `wfswarm`, and `vertx`.
 +
 [source, shell]
 ----
 oc new-app --template=<runtime>-messaging-work-queue-frontend
 ----
 
-. Create a worker application.
+. Create the worker application.  This command builds and deploys the
+  backend worker.
 +
 [source, shell]
 ----
-oc new-app --template=<runtime>-messaging-work-queue-frontend
+oc new-app --template=<runtime>-messaging-work-queue-worker
 ----
 
-// Scaling the number of workers
+=== Operation
+
+. Navigate to the frontend web server.  Use the URL shown under the
+  `<runtime>-messaging-work-queue-frontend` application in the project
+  overview.
+
+. Enter text in the *Requests* form.
+
+. See the response text in uppercase under *Responses*.
+
+. In the OpenShift console, increase the number of worker pods to two.
+
+. In the frontend web UI, note the presence of two workers under
+  *Workers*.
+
+. Submit multiple requests.
+
+. See responses returned from both workers.
 
 == Acceptance Criteria
 
-XXX
+An HTTP request to `http://<frontend>/api/send-request` with the JSON
+payload `{"text": "abc"}` succeeds.  Subsequent requests to
+`http://<frontend>/api/data` contain the JSON
+`{"responses":[{"workerId":"<id>","text": "ABC"}]}`.
 
 === Vert.x-specific Acceptance Criteria
 
-XXX
-
 === Swarm-specific Acceptance Criteria
-
-XXX
 
 === Spring Boot-specific Acceptance Criteria
 
-XXX
-
 === Node.js Acceptance Criteria
-
-XXX
 
 == Integration Requirements
 
