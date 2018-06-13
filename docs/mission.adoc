@@ -70,16 +70,6 @@ not need to know which process the request came from.
 * The user has selected a project in which the frontend and backend
   processes will be deployed.
 
-* The user's project has an instance of AMQ Broker installed and
-  running.  The backend and frontend processes have permission to
-  connect to the broker.
-
-* The broker has a queue named `upstate/requests`.  The frontend and
-  backend processes can send and receive messages there.
-
-* The broker has a topic named `upstate/worker-status`.  The frontend
-  and backend processes can send and receive messages there.
-
 == Use Case
 
 This mission demonstrates a distributed messaging application.  It
@@ -97,7 +87,40 @@ address of this queue in its request.  After processing the work, the
 backend worker sends the result as a response to the pre-established
 response queue.
 
-XXX
+. Apply the OpenShift templates.
++
+[source, shell]
+----
+oc apply -f templates/
+----
+
+. Create the broker application.
++
+[source, shell]
+----
+oc new-app --template=amq63-basic \
+  -p APPLICATION_NAME=work-queue-broker \
+  -p IMAGE_STREAM_NAMESPACE=$(oc project -q) \
+  -p MQ_PROTOCOL=amqp \
+  -p MQ_QUEUES=work-queue/requests,work-queue/responses \
+  -p MQ_TOPICS=work-queue/worker-updates \
+  -p MQ_USERNAME=work-queue \
+  -p MQ_PASSWORD=work-queue
+----
+
+. Create a frontend application.
++
+[source, shell]
+----
+oc new-app --template=<runtime>-messaging-work-queue-frontend
+----
+
+. Create a worker application.
++
+[source, shell]
+----
+oc new-app --template=<runtime>-messaging-work-queue-frontend
+----
 
 // Scaling the number of workers
 
@@ -130,6 +153,7 @@ XXX
 Demo code - <https://github.com/ssorj/upstate>
 
 == Approval
+
 |=======
 |PM|https://github.com/<username>[Name]|&#x2611;
 |DevExp|https://github.com/<username>[Name]|&#x2611;

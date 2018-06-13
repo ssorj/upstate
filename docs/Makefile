@@ -1,5 +1,5 @@
 mission.html: mission.adoc
-	asciidoc $<
+	asciidoctor $<
 
 .PHONY: clean
 clean:
