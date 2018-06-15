@@ -12,16 +12,16 @@
 
 This mission demonstrates how to dispatch tasks to a scalable set of
 worker processes using a message queue.  It uses the AMQP 1.0 message
-protocol to send and receive messages.  The workers are implemented in
+protocol to send and receive messages.  The workers may be implemented in
 a variety of different languages and application runtimes.
 
-Having a single, well known shared resource for adding and consuming
+Having a single, well-known shared resource for adding and consuming
 work makes it easier to scale the number of workers up and down.  The
 frontend process does not need to know any of the details of the
 backend workers.  The use of a standard messaging protocol enables
 frontends and workers written in any language to interoperate.
 
-The mission covers:
+This mission covers:
 
 * Sending work requests to a common work queue
 * Receiving and processing work requests as they come in
@@ -44,7 +44,8 @@ not need to know which process the request came from.
 
 == Concepts and Architectural Patterns
 
-This mission demonstrates a distributed messaging application.  It
+This mission demonstrates a pattern called request/response messaging, a 
+distributed messaging paradigm which uses a shared work queue.  It 
 contains multiple components that communicate using a messaging
 server.
 
@@ -75,17 +76,14 @@ result as a response to the pre-established response queue.
 
 * Scaling backend workers up and down.  The operator can freely add
   and remove backend workers.
-
-== Prerequisites
-
-* The user has access to an OpenShift instance and is logged in.
-
-* The user has selected a project in which the frontend and backend
-  processes will be deployed.
+  
+==== ALR Note: Let's add a paragraph noting that the client will poll for new data and receive a list of all requests; this approach may or may not fit the needs of your application as compared with event-based/push mechanisms.
 
 == Use Case
 
 === Deployment
+
+==== ALR Note: This to me reads more like documentation notes for how to use in the ZIP download case, because the launcher handles deployment when done using CI/CD Build and Deploy.  Recommend asking the docs team where this goes best.
 
 . Apply the OpenShift templates to your current project.  The
   templates create OpenShift entities that are used in subsequent
@@ -136,7 +134,9 @@ oc new-app --template=<runtime>-messaging-work-queue-worker
   `<runtime>-messaging-work-queue-frontend` application in the project
   overview.
 
-. Enter text in the *Requests* form.
+. Enter text in the *Requests* form field.  The system will be responsible 
+for perfoming a "to upper case" operation on the input, returning the result, which 
+is also tagged with the worker ID.
 
 . See the response text in uppercase under *Responses*.
 
@@ -151,10 +151,12 @@ oc new-app --template=<runtime>-messaging-work-queue-worker
 
 == Acceptance Criteria
 
-An HTTP POST to `http://<frontend>/api/send-request` with the JSON
-payload `{"text": "abc"}` succeeds.  Subsequent GET requests to
-`http://<frontend>/api/data` contain the JSON
-`{"responses":[{"workerId":"<id>","text": "ABC"}]}`.
+* An HTTP POST to `http://<frontend>/api/send-request` with the JSON
+payload `{"text": "abc"}` succeeds with no return value.  
+
+* Subsequent GET requests to `http://<frontend>/api/data` contain the JSON
+`{"responses":[{"workerId":"<id>","text": "ABC"}]}`, which represents 
+all requests that have been processed by the system.
 
 === Vert.x-specific Acceptance Criteria
 
@@ -177,20 +179,6 @@ Spring Boot booster - <https://github.com/gytis/spring-boot-messaging-booster>
 WildFly Swarm booster - <https://github.com/ssorj/wfswarm-messaging-work-queue>
 
 Vert.x booster - <https://github.com/ssorj/vertx-messaging-work-queue-booster>
-
-== Approval
-
-|=======
-|PM|https://github.com/<username>[Name]|&#x2611;
-|DevExp|https://github.com/<username>[Name]|&#x2611;
-|Vert.x|https://github.com/<usernname>[Name]|&#x2611;
-|WildFly Swarm|https://github.com/<username>[Name]|&#x2611;
-|Spring Boot|https://github.com/<username>[Name]|&#x2611;
-|Node.js|https://github.com/<username>[Name]|&#x2611;
-|QE|https://github.com/<username>[Name]|&#x2611;
-|Docs|https://github.com/<username>[Name]|&#x2611;
-|Architect|https://github.com/<username>[Name]|&#x2610;
-|=======
 
 // unchecked = &#x2610;
 // checked = &#x2611;
