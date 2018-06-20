@@ -11,43 +11,42 @@
 == Description
 
 This mission demonstrates how to dispatch tasks to a scalable set of
-worker processes using a message queue.  It uses the AMQP 1.0 message
-protocol to send and receive messages.  The workers may be implemented in
-a variety of different languages and application runtimes.
+worker services using a message queue.  It uses the AMQP 1.0 message
+protocol to send and receive messages.  The workers can be implemented
+in a variety of different languages and application runtimes.
 
 Having a single, well-known shared resource for adding and consuming
 work makes it easier to scale the number of workers up and down.  The
-frontend process does not need to know any of the details of the
-backend workers.  The use of a standard messaging protocol enables
-frontends and workers written in any language to interoperate.
+frontend does not need to know any of the details of the backend
+workers.  The use of a standard messaging protocol enables frontends
+and workers written in any language to interoperate.
 
 This mission covers:
 
 * Sending work requests to a common work queue
 * Receiving and processing work requests as they come in
-* Sending the processed result back to the requesting process
+* Sending the processed result back to the requesting service
 * Adding new workers as demand increases or removing workers as it dies down
-* Monitoring the status of the worker processes
+* Monitoring the current state of the worker services
 
 == User Problem
 
 The user has a large number of discrete tasks that require processing.
 To make sure they are processed with satisfactory speed, the user
-wants to be able to add worker processes on demand as the number of
+wants to be able to add worker services on demand as the number of
 outstanding tasks grows.
 
-One could achieve this by telling every requesting process about every
-worker process, but that requires updating many potential requesters.
+One could achieve this by telling every requesting service about every
+worker service, but that requires updating many potential requesters.
 Instead, the user wants to design the system so that the requester
 does not need to know how many workers there are, and the workers do
-not need to know which process the request came from.
+not need to know which service the request came from.
 
 == Concepts and Architectural Patterns
 
-This mission demonstrates a pattern called request/response messaging, a 
-distributed messaging paradigm which uses a shared work queue.  It 
-contains multiple components that communicate using a messaging
-server.
+This mission contains a distributed messaging application that
+demonstrates the request-response messaging pattern. It contains
+multiple components that communicate using a messaging server.
 
 The frontend, a web server, registers requests to perform work by
 sending a request message to a well known queue.  A backend worker
@@ -76,14 +75,16 @@ result as a response to the pre-established response queue.
 
 * Scaling backend workers up and down.  The operator can freely add
   and remove backend workers.
-  
-==== ALR Note: Let's add a paragraph noting that the client will poll for new data and receive a list of all requests; this approach may or may not fit the needs of your application as compared with event-based/push mechanisms.
+
+The frontend uses HTTP to communicate with a browser.  The browser
+submits new requests by performing HTTP POSTs, and it polls for
+responses by performing periodic HTTP GETs.  This approach may or may
+not fit the needs of your application.  An alternative approach might
+consume push events delivered directly to the browser.
 
 == Use Case
 
 === Deployment
-
-==== ALR Note: This to me reads more like documentation notes for how to use in the ZIP download case, because the launcher handles deployment when done using CI/CD Build and Deploy.  Recommend asking the docs team where this goes best.
 
 . Apply the OpenShift templates to your current project.  The
   templates create OpenShift entities that are used in subsequent
@@ -151,20 +152,98 @@ is also tagged with the worker ID.
 
 == Acceptance Criteria
 
-* An HTTP POST to `http://<frontend>/api/send-request` with the JSON
-payload `{"text": "abc"}` succeeds with no return value.  
+=== Frontend
 
-* Subsequent GET requests to `http://<frontend>/api/data` contain the JSON
-`{"responses":[{"workerId":"<id>","text": "ABC"}]}`, which represents 
-all requests that have been processed by the system.
+* An HTTP POST to `http://<frontend>/api/send-request` with the
+  following JSON payload succeeds.  The processed result is not
+  returned in the HTTP response.
++
+[source, json]
+----
+{
+  "text": "abc"
+}
+----
 
-=== Vert.x-specific Acceptance Criteria
+* Subsequent GET requests to `http://<frontend>/api/data` contain the
+  following JSON, which represents all requests that have been
+  processed by the system.
++
+[source, json]
+----
+{
+  "responses": [
+    {
+      "workerId": "<worker-id>",
+      "text": "ABC"
+    }
+  ]
+}
+----
 
-=== Swarm-specific Acceptance Criteria
+=== Queues and Topics
 
-=== Spring Boot-specific Acceptance Criteria
+All queues and topics use the prefix `work-queue` to avoid collisions
+with any other applications using the broker.
 
-=== Node.js Acceptance Criteria
+* Queue `work-queue/requests`
+
+* Topic `work-queue/worker-updates`
+
+Some runtime environments do not allow for creation of dynamic reply
+queues.  In these cases, a queue named `work-queue/responses` is used.
+
+* Queue `work-queue/responses`
+
+=== Worker IDs
+
+Worker IDs take the form `worker-<runtime>-<four-digit-unique-ID>`,
+where `<runtime>` is one of `nodejs`, `spring`, `wfswarm`, or
+`vertx`. Examples:
+
+* `worker-nodejs-4d78`
+* `worker-wfswarm-18ac`
+* `worker-spring-dc7e`
+
+=== Request Message Format
+
+On receiving user input, the frontend sends a request message to the
+`work-queue/requests` queue.  Workers consume new requests from the
+queue.
+
+The request message must have the following elements.
+
+* Property `reply-to`: Either a dynamically generated reply queue (if
+  possible) or `work-queue/responses` (AMQP string)
+
+* Body: Text supplied by the user (AMQP string)
+
+=== Response Message Format
+
+After processing a request, the worker sends a response message to the
+queue indicated by the `reply-to` property of the request message.
+
+The response message must have the following elements.
+
+* Application property `workerId`: The worker ID (AMQP string)
+
+* Body: The user text after processing (AMQP string)
+
+=== Worker Update Message Format
+
+Workers send update messages every five seconds to the
+`work-queue/worker-updates` topic.  The frontend subscribes to the
+topic and keeps the latest status for each worker.
+
+The update message must have the following elements.
+
+* Application property `timestamp`: The current time in milliseconds
+  (AMQP long)
+
+* Application property `workerId`: The worker ID (AMQP string)
+
+* Application property `requestsProcessed`: The total number of
+  requests processed (AMQP long)
 
 == Integration Requirements
 
