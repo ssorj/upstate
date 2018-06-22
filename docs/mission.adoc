@@ -174,8 +174,34 @@ is also tagged with the worker ID.
 {
   "responses": [
     {
-      "workerId": "<worker-id>",
+      "workerId": "vertx-worker-d423",
       "text": "ABC"
+    },
+    {
+      "workerId": "nodejs-worker-7f4a",
+      "text": "XYZ"
+    }
+  ]
+  ...
+}
+----
+
+* Workers send periodic status updates to the frontend.  Their current
+  status is also represented in JSON returned from
+  `http://<frontend>/api/data`.
++
+[source, json]
+----
+{
+  ...
+  "workers": {
+    "vertx-worker-d423": {
+      "timestamp": 1529684986,
+      "requestsProcessed": 100
+    },
+    "nodejs-worker-7f4a": {
+      "timestamp": 1529684986,
+      "requestsProcessed": 99
     }
   ]
 }
