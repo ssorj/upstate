@@ -203,7 +203,7 @@ is also tagged with the worker ID.
       "timestamp": 1529684986,
       "requestsProcessed": 99
     }
-  ]
+  }
 }
 ----
 
