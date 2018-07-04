@@ -221,6 +221,7 @@ status 404.
   status is also represented in the JSON returned from
   `http://FRONTEND/api/data`.
 +
+.HTTP response (application/json)
 [source, json]
 ----
 {
