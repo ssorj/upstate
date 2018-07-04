@@ -154,54 +154,90 @@ is also tagged with the worker ID.
 
 === Frontend
 
-* An HTTP POST to `http://<frontend>/api/send-request` with the
-  following JSON payload succeeds.  The processed result is not
-  returned in the HTTP response.
+* An HTTP POST to `http://FRONTEND/api/send-request` with the
+  following JSON payload returns with status code 202.  The body of
+  the response is an ID representing the request.
 +
+.HTTP request (application/json)
 [source, json]
 ----
 {
-  "text": "abc"
+  "text": "abc",
+  "uppercase": true,
+  "reverse": false
 }
 ----
++
+.HTTP response (text/plain)
+[source]
+----
+vertx-frontend-78c3/1
+----
 
-* Subsequent GET requests to `http://<frontend>/api/data` contain the
+* An HTTP GET to
+  `http://FRONTEND/api/receive-response?request=REQUEST-ID` returns
+  the following JSON payload representing the response with status
+  200.  `REQUEST-ID` is the ID returned from `/send-request`.
++
+.HTTP response (application/json)
+[source, json]
+----
+{
+  "requestId": "vertx-frontend-78c3/1",
+  "workerId": "vertx-worker-d423",
+  "text": "ABC"
+}
+----
++
+If processing of the request is not yet finished, the call returns
+status 404.
+
+* Subsequent GET requests to `http://FRONTEND/api/data` contain the
   following JSON, which represents all requests that have been
   processed by the system.
 +
+.HTTP response (application/json)
 [source, json]
 ----
 {
-  "responses": [
-    {
+  "requestIds": ["vertx-frontend-78c3/1", "vertx-frontend-78c3/2"],
+  "responses": {
+    "vertx-frontend-78c3/1": {
+      "requestId": "vertx-frontend-78c3/1",
       "workerId": "vertx-worker-d423",
       "text": "ABC"
     },
-    {
+    "vertx-frontend-78c3/2": {
+      "requestId": "vertx-frontend-78c3/2",
       "workerId": "nodejs-worker-7f4a",
       "text": "XYZ"
     }
-  ]
-  ...
+  },
+  "workers": {}
 }
 ----
 
 * Workers send periodic status updates to the frontend.  Their current
-  status is also represented in JSON returned from
-  `http://<frontend>/api/data`.
+  status is also represented in the JSON returned from
+  `http://FRONTEND/api/data`.
 +
 [source, json]
 ----
 {
-  ...
+  "requestIds: [],
+  "responses": {},
   "workers": {
     "vertx-worker-d423": {
+      "workerId": "vertx-worker-d423",
       "timestamp": 1529684986,
-      "requestsProcessed": 100
+      "requestsProcessed": 100,
+      "processingErrors": 0
     },
     "nodejs-worker-7f4a": {
+      "workerId": "nodejs-worker-7f4a",
       "timestamp": 1529684986,
-      "requestsProcessed": 99
+      "requestsProcessed": 99,
+      "processingErrors": 1
     }
   }
 }
@@ -239,8 +275,16 @@ queue.
 
 The request message must have the following elements.
 
+* Property `message-id`: A unique request ID (AMQP string)
+
 * Property `reply-to`: Either a dynamically generated reply queue (if
   possible) or `work-queue/responses` (AMQP string)
+
+* Application property `uppercase`: A boolean indicating whether to
+  uppercase the text (AMQP boolean)
+
+* Application property `reverse`: A boolean indicating whether to
+  reverse the text (AMQP boolean)
 
 * Body: Text supplied by the user (AMQP string)
 
@@ -250,6 +294,9 @@ After processing a request, the worker sends a response message to the
 queue indicated by the `reply-to` property of the request message.
 
 The response message must have the following elements.
+
+* Property `correlation-id`: The request ID associated with this
+  response (AMQP string)
 
 * Application property `workerId`: The worker ID (AMQP string)
 
@@ -270,6 +317,9 @@ The update message must have the following elements.
 
 * Application property `requestsProcessed`: The total number of
   requests processed (AMQP long)
+
+* Application property `processingErrors`: The total number of
+  errors encountered during processing (AMQP long)
 
 == Integration Requirements
 
