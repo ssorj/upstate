@@ -84,6 +84,7 @@ consume push events delivered directly to the browser.
 
 == Use Case
 
+////
 === Deployment
 
 . Apply the OpenShift templates to your current project.  The
@@ -130,6 +131,7 @@ oc new-app --template=<runtime>-messaging-work-queue-worker
 ----
 
 === Operation
+////
 
 . Navigate to the frontend web server.  Use the URL shown under the
   `<runtime>-messaging-work-queue-frontend` application in the project
