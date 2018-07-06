@@ -177,7 +177,7 @@ vertx-frontend-78c3/1
 * An HTTP GET to
   `http://FRONTEND/api/receive-response?request=REQUEST-ID` returns
   the following JSON payload representing the response with status
-  200.  `REQUEST-ID` is the ID returned from `/send-request`.
+  200+++.+++  `REQUEST-ID` is the ID returned from `/send-request`.
 +
 .HTTP response (application/json)
 [source, json]
