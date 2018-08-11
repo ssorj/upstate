@@ -79,13 +79,13 @@ message broker, a message router, or a cloud messaging service.
 .Application components and network protocols
 image::images/protocols.svg[]
 
-.Component instances and connections
+.Component instances and network connections
 image::images/connections.svg[]
 
 // Adding and removing workers dynamically.
 // Load balancing - faster worker receives more requests.
 
-=== Work requests
+=== Work requests and worker responses
 
 ////
 When the frontend opens a link to the request queue, it also
@@ -94,21 +94,21 @@ queue in its request.  After processing the work, the backend worker
 sends the result as a response to the pre-established response queue.
 ////
 
-.Request-response
+.The request-response pattern
 image::images/request-response.svg[]
 
-.Requests
+.Work requests
 image::images/requests.svg[]
 
-.Responses
+.Worker responses
 image::images/responses.svg[]
 
 === Worker status updates
 
-.Publish-subscribe
+.The publish-subscribe pattern
 image::images/publish-subscribe.svg[]
 
-.Worker updates
+.Worker status updates
 image::images/worker-updates.svg[]
 
 ////
