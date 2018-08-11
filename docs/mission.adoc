@@ -1,4 +1,4 @@
-= Scalable Task Processing Using a Shared Work Queue
+= Scalable task processing using a shared work queue
 
 :toc:
 
@@ -29,7 +29,7 @@ This mission covers:
 * Adding new workers as demand increases or removing workers as it dies down
 * Monitoring the current state of the worker services
 
-== User Problem
+== User problem
 
 The user has a large number of discrete tasks that require processing.
 To make sure they are processed with satisfactory speed, the user
@@ -42,24 +42,15 @@ Instead, the user wants to design the system so that the requester
 does not need to know how many workers there are, and the workers do
 not need to know which service the request came from.
 
-== Concepts and Architectural Patterns
+== Concepts and architectural patterns
 
 This mission contains a distributed messaging application that
 demonstrates the request-response messaging pattern. It contains
-multiple components that communicate using a messaging server.
-
-The frontend, a web server, registers requests to perform work by
-sending a request message to a well known queue.  A backend worker
-then fetches the work request from the queue and performs the work.
-
-When the frontend creates the request message, it also establishes a
-queue for responses.  It includes the address of this queue in its
-request.  After processing the work, the backend worker sends the
-result as a response to the pre-established response queue.
+multiple services that communicate using a messaging server.
 
 * Sending and receiving messages.  The application uses the AMQP
-  message protocol to communicate using queues and topics on a message
-  server.
+  message protocol to communicate using anycast and multicast message
+  distribution.
 
 * Sending request messages and receiving response messages.  The
   application demonstrates how the request-response messaging pattern
@@ -67,7 +58,7 @@ result as a response to the pre-established response queue.
 
 * Periodically sending broadcast updates.  The application
   demonstrates use of the publish-subscribe messaging pattern for
-  distributing information to multiple consumers.
+  distributing information to multiple receivers.
 
 * Maintaining connections between services.  The frontend and backend
   components reconnect to the message server if the connection is
@@ -76,13 +67,63 @@ result as a response to the pre-established response queue.
 * Scaling backend workers up and down.  The operator can freely add
   and remove backend workers.
 
+=== Application components
+
+////
+Your web browser communicates with the frontend web server over HTTP.
+The frontend communicates with workers over AMQP through an
+intermediary messaging service.  The messaging service can be a
+message broker, a message router, or a cloud messaging service.
+////
+
+.Application components and network protocols
+image::images/protocols.svg[]
+
+.Component instances and connections
+image::images/connections.svg[]
+
+// Adding and removing workers dynamically.
+// Load balancing - faster worker receives more requests.
+
+=== Work requests
+
+////
+When the frontend opens a link to the request queue, it also
+establishes a queue for responses.  It includes the address of this
+queue in its request.  After processing the work, the backend worker
+sends the result as a response to the pre-established response queue.
+////
+
+.Request-response
+image::images/request-response.svg[]
+
+.Requests
+image::images/requests.svg[]
+
+.Responses
+image::images/responses.svg[]
+
+=== Worker status updates
+
+.Publish-subscribe
+image::images/publish-subscribe.svg[]
+
+.Worker updates
+image::images/worker-updates.svg[]
+
+////
+The frontend, a web server, registers requests to perform work by
+sending a request message to a well known queue.  A backend worker
+then fetches the work request from the queue and performs the work.
+
 The frontend uses HTTP to communicate with a browser.  The browser
 submits new requests by performing HTTP POSTs, and it polls for
 responses by performing periodic HTTP GETs.  This approach may or may
 not fit the needs of your application.  An alternative approach might
 consume push events delivered directly to the browser.
+////
 
-== Use Case
+== Use case
 
 ////
 === Deployment
@@ -152,7 +193,7 @@ is also tagged with the worker ID.
 
 . See responses returned from each worker in turn.
 
-== Acceptance Criteria
+== Acceptance criteria
 
 === Frontend
 
@@ -246,7 +287,7 @@ status 404.
 }
 ----
 
-=== Queues and Topics
+=== Queues and topics
 
 All queues and topics use the prefix `work-queue` to avoid collisions
 with any other applications using the broker.
@@ -270,7 +311,7 @@ where `<runtime>` is one of `nodejs`, `spring`, `wfswarm`, or
 * `worker-wfswarm-18ac`
 * `worker-spring-dc7e`
 
-=== Request Message Format
+=== Request message format
 
 On receiving user input, the frontend sends a request message to the
 `work-queue/requests` queue.  Workers consume new requests from the
@@ -291,7 +332,7 @@ The request message must have the following elements.
 
 * Body: Text supplied by the user (AMQP string)
 
-=== Response Message Format
+=== Response message format
 
 After processing a request, the worker sends a response message to the
 queue indicated by the `reply-to` property of the request message.
@@ -305,7 +346,7 @@ The response message must have the following elements.
 
 * Body: The user text after processing (AMQP string)
 
-=== Worker Update Message Format
+=== Worker update message format
 
 Workers send update messages every five seconds to the
 `work-queue/worker-updates` topic.  The frontend subscribes to the
@@ -323,10 +364,6 @@ The update message must have the following elements.
 
 * Application property `processingErrors`: The total number of
   errors encountered during processing (AMQP long)
-
-== Integration Requirements
-
-== Tags
 
 == Notes
 
