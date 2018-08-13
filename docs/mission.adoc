@@ -394,12 +394,12 @@ Application property `requestsProcessed`::
 Application property `processingErrors`::
   The total number of errors encountered during processing (AMQP long)
 
-== Notes
+== Implementations
 
-Node.js booster - <https://github.com/bucharest-gold/nodejs-messaging-work-queue>
+Node.js - <https://github.com/bucharest-gold/nodejs-messaging-work-queue>
 
-Spring Boot booster - <https://github.com/gytis/spring-boot-messaging-booster>
+Spring Boot - <https://github.com/gytis/spring-boot-messaging-booster>
 
-WildFly Swarm booster - <https://github.com/ssorj/wfswarm-messaging-work-queue>
+WildFly Swarm - <https://github.com/ssorj/wfswarm-messaging-work-queue>
 
-Vert.x booster - <https://github.com/openshiftio-vertx-boosters/vertx-messaging-work-queue-booster>
+Vert.x - <https://github.com/openshiftio-vertx-boosters/vertx-messaging-work-queue-booster>
