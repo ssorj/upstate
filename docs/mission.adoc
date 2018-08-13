@@ -80,8 +80,9 @@ messaging service.
 image::images/protocols.svg[]
 
 There can be multiple instances of the frontend and worker services.
-Frontends and workers can be added and removed dynamically.
-Each instance of a service maintains a network connection to the messaging service.
+Frontends and workers can be added and removed dynamically.  Each
+instance of a service maintains a network connection to the messaging
+service.
 
 .Component instances and network connections
 image::images/connections.svg[]
@@ -91,51 +92,59 @@ image::images/connections.svg[]
 A work request takes the form of an AMQP message.  The messaging
 service provides a shared message queue named `work-queue/requests`.
 Frontend services add new requests to the front of the queue, and
-worker services remove requests from the back of the queue.
+worker services consume the requests from the back of the queue.
 
 After processing, a worker responds with another AMQP message
-containing the processed result.  When the frontend first creates a
-link to the request queue, it also establishes a queue for responses.
-It includes the address of this queue in each work request.  When the
-worker finishes processing a request, it sends the result to the
-pre-established response queue.
+containing the processed result.  When a frontend first creates a link
+to the request queue, it also establishes a queue for responses.  It
+includes the address of the response queue in each work request.  When
+the worker finishes processing a request, it sends the result to the
+embedded reply-to address.
 
-.The request-response pattern
+.The request-response messaging pattern
 image::images/request-response.svg[]
 
-Each work request is processed once by the worker that removed it from
-the queue.  Faster workers will process more work requests, and slower
-workers fewer.  The workload is balanced across the workers according
-to their processing capacity.
+`work-queue/requests` is a queue (as opposed to a topic), meaning that
+each message is ordinarily processed by only one receiver.  This
+behavior is also known as anycast message distribution.
 
-.Work requests
+Faster workers will process more requests, and slower workers fewer.
+The workload is balanced across the workers according to their
+processing capacity.
+
+.Work requests flowing to the workers
 image::images/requests.svg[]
 
 Each worker response is sent to the dedicated response queue of the
 frontend that initiated the request.
 
-.Worker responses
+.Worker responses returning to the frontends
 image::images/responses.svg[]
 
 === Worker status updates
 
-.The publish-subscribe pattern
+Each worker service periodically publishes its current status to a
+topic named `work-queue/worker-updates`.  The frontend services
+subscribe to this topic.  All of the frontends receive a copy of each
+worker update.
+
+.The publish-subscribe messaging pattern
 image::images/publish-subscribe.svg[]
+
+`work-queue/worker-updates` is a topic (as opposed to a queue),
+meaning that each message is available to multiple receivers.  This
+behavior is also known as multicast message distribution.
 
 .Worker status updates
 image::images/worker-updates.svg[]
 
-////
-The frontend, a web server, registers requests to perform work by
-sending a request message to a well known queue.  A backend worker
-then fetches the work request from the queue and performs the work.
+=== Frontend communication
 
 The frontend uses HTTP to communicate with a browser.  The browser
 submits new requests by performing HTTP POSTs, and it polls for
 responses by performing periodic HTTP GETs.  This approach may or may
 not fit the needs of your application.  An alternative approach might
 consume push events delivered directly to the browser.
-////
 
 == Use case
 
@@ -325,7 +334,7 @@ where `<runtime>` is one of `nodejs`, `spring`, `wfswarm`, or
 * `worker-wfswarm-18ac`
 * `worker-spring-dc7e`
 
-=== Request message format
+=== Work request message format
 
 On receiving user input, the frontend sends a request message to the
 `work-queue/requests` queue.  Workers consume new requests from the
@@ -333,32 +342,37 @@ queue.
 
 The request message must have the following elements.
 
-* Property `message-id`: A unique request ID (AMQP string)
+Property `message-id`::
+  A unique request ID (AMQP string)
 
-* Property `reply-to`: Either a dynamically generated reply queue (if
-  possible) or `work-queue/responses` (AMQP string)
+Property `reply-to`::
+  Either a dynamically generated reply queue (if possible) or
+  `work-queue/responses` (AMQP string)
 
-* Application property `uppercase`: A boolean indicating whether to
-  uppercase the text (AMQP boolean)
+Application property `uppercase`::
+  A boolean indicating whether to uppercase the text (AMQP boolean)
 
-* Application property `reverse`: A boolean indicating whether to
-  reverse the text (AMQP boolean)
+Application property `reverse`::
+  A boolean indicating whether to reverse the text (AMQP boolean)
 
-* Body: Text supplied by the user (AMQP string)
+Body::
+  Text supplied by the user (AMQP string)
 
-=== Response message format
+=== Worker response message format
 
 After processing a request, the worker sends a response message to the
 queue indicated by the `reply-to` property of the request message.
 
 The response message must have the following elements.
 
-* Property `correlation-id`: The request ID associated with this
-  response (AMQP string)
+Property `correlation-id`::
+  The request ID associated with this response (AMQP string)
 
-* Application property `workerId`: The worker ID (AMQP string)
+Application property `workerId`::
+  The worker ID (AMQP string)
 
-* Body: The user text after processing (AMQP string)
+Body::
+  The user text after processing (AMQP string)
 
 === Worker update message format
 
@@ -368,16 +382,17 @@ topic and keeps the latest status for each worker.
 
 The update message must have the following elements.
 
-* Application property `timestamp`: The current time in milliseconds
-  (AMQP long)
+Application property `timestamp`::
+  The current time in milliseconds (AMQP long)
 
-* Application property `workerId`: The worker ID (AMQP string)
+Application property `workerId`::
+  The worker ID (AMQP string)
 
-* Application property `requestsProcessed`: The total number of
-  requests processed (AMQP long)
+Application property `requestsProcessed`::
+  The total number of requests processed (AMQP long)
 
-* Application property `processingErrors`: The total number of
-  errors encountered during processing (AMQP long)
+Application property `processingErrors`::
+  The total number of errors encountered during processing (AMQP long)
 
 == Notes
 
@@ -387,7 +402,7 @@ Spring Boot booster - <https://github.com/gytis/spring-boot-messaging-booster>
 
 WildFly Swarm booster - <https://github.com/ssorj/wfswarm-messaging-work-queue>
 
-Vert.x booster - <https://github.com/ssorj/vertx-messaging-work-queue-booster>
+Vert.x booster - <https://github.com/openshiftio-vertx-boosters/vertx-messaging-work-queue-booster>
 
 // unchecked = &#x2610;
 // checked = &#x2611;
