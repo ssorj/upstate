@@ -135,7 +135,7 @@ image::images/publish-subscribe.svg[]
 meaning that each message is available to multiple receivers.  This
 behavior is also known as multicast message distribution.
 
-.Worker status updates
+.Worker status updates flowing to the frontends
 image::images/worker-updates.svg[]
 
 === Frontend communication
