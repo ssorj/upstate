@@ -123,10 +123,10 @@ image::images/responses.svg[]
 
 === Worker status updates
 
-Each worker service periodically publishes its current status to a
-topic named `work-queue/worker-updates`.  The frontend services
-subscribe to this topic.  All of the frontends receive a copy of each
-worker update.
+Each worker service periodically publishes an AMQP message containing
+its current status to a topic named `work-queue/worker-updates`.  The
+frontend services subscribe to this topic.  All subscribers receive a
+copy of each update.
 
 .The publish-subscribe messaging pattern
 image::images/publish-subscribe.svg[]
