@@ -313,7 +313,7 @@ status 404.
 === Queues and topics
 
 All queues and topics use the prefix `work-queue` to avoid collisions
-with any other applications using the broker.
+with any other applications using the messaging service.
 
 * Queue `work-queue/requests`
 
