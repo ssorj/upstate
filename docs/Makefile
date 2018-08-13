@@ -7,4 +7,4 @@ clean:
 
 .PHONY: publish
 publish: mission.html
-	rsync -av $< file.rdu.redhat.com:public_html/messaging-work-queue/$<
+	rsync -av $< images file.rdu.redhat.com:public_html/messaging-work-queue/
