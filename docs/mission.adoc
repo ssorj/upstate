@@ -67,7 +67,7 @@ multiple services that communicate using a messaging server.
 * Scaling backend workers up and down.  The operator can freely add
   and remove backend workers.
 
-=== Application components
+=== Services and network communication
 
 This application is implemented as multiple independent services that
 communicate over the network.  Your web browser communicates with the
@@ -76,7 +76,7 @@ over AMQP by way of an intermediary messaging service.  The messaging
 service can be a message broker, a message router, or a cloud
 messaging service.
 
-.Application components and network protocols
+.Application services and network protocols
 image::images/protocols.svg[]
 
 There can be multiple instances of the frontend and worker services.
@@ -84,7 +84,7 @@ Frontends and workers can be added and removed dynamically.  Each
 instance of a service maintains a network connection to the messaging
 service.
 
-.Component instances and network connections
+.Service instances and network connections
 image::images/connections.svg[]
 
 === Work requests and worker responses
@@ -403,6 +403,3 @@ Spring Boot booster - <https://github.com/gytis/spring-boot-messaging-booster>
 WildFly Swarm booster - <https://github.com/ssorj/wfswarm-messaging-work-queue>
 
 Vert.x booster - <https://github.com/openshiftio-vertx-boosters/vertx-messaging-work-queue-booster>
-
-// unchecked = &#x2610;
-// checked = &#x2611;
