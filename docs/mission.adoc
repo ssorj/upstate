@@ -69,36 +69,50 @@ multiple services that communicate using a messaging server.
 
 === Application components
 
-////
-Your web browser communicates with the frontend web server over HTTP.
-The frontend communicates with workers over AMQP through an
-intermediary messaging service.  The messaging service can be a
-message broker, a message router, or a cloud messaging service.
-////
+This application is implemented as multiple independent services that
+communicate over the network.  Your web browser communicates with the
+frontend web server over HTTP.  The frontend communicates with workers
+over AMQP by way of an intermediary messaging service.  The messaging
+service can be a message broker, a message router, or a cloud
+messaging service.
 
 .Application components and network protocols
 image::images/protocols.svg[]
 
+There can be multiple instances of the frontend and worker services.
+Frontends and workers can be added and removed dynamically.
+Each instance of a service maintains a network connection to the messaging service.
+
 .Component instances and network connections
 image::images/connections.svg[]
 
-// Adding and removing workers dynamically.
-// Load balancing - faster worker receives more requests.
-
 === Work requests and worker responses
 
-////
-When the frontend opens a link to the request queue, it also
-establishes a queue for responses.  It includes the address of this
-queue in its request.  After processing the work, the backend worker
-sends the result as a response to the pre-established response queue.
-////
+A work request takes the form of an AMQP message.  The messaging
+service provides a shared message queue named `work-queue/requests`.
+Frontend services add new requests to the front of the queue, and
+worker services remove requests from the back of the queue.
+
+After processing, a worker responds with another AMQP message
+containing the processed result.  When the frontend first creates a
+link to the request queue, it also establishes a queue for responses.
+It includes the address of this queue in each work request.  When the
+worker finishes processing a request, it sends the result to the
+pre-established response queue.
 
 .The request-response pattern
 image::images/request-response.svg[]
 
+Each work request is processed once by the worker that removed it from
+the queue.  Faster workers will process more work requests, and slower
+workers fewer.  The workload is balanced across the workers according
+to their processing capacity.
+
 .Work requests
 image::images/requests.svg[]
+
+Each worker response is sent to the dedicated response queue of the
+frontend that initiated the request.
 
 .Worker responses
 image::images/responses.svg[]
@@ -268,7 +282,7 @@ status 404.
 [source, json]
 ----
 {
-  "requestIds: [],
+  "requestIds": [],
   "responses": {},
   "workers": {
     "vertx-worker-d423": {
@@ -279,7 +293,7 @@ status 404.
     },
     "nodejs-worker-7f4a": {
       "workerId": "nodejs-worker-7f4a",
-      "timestamp": 1529684986,
+      "timestamp": 1529684991,
       "requestsProcessed": 99,
       "processingErrors": 1
     }
