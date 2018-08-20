@@ -398,8 +398,9 @@ Application property `processingErrors`::
 
 Node.js - <https://github.com/bucharest-gold/nodejs-messaging-work-queue>
 
-Spring Boot - <https://github.com/gytis/spring-boot-messaging-booster>
+Spring Boot - <https://github.com/snowdrop/spring-boot-messaging-work-queue-booster>
 
 WildFly Swarm - <https://github.com/ssorj/wfswarm-messaging-work-queue>
+// WildFly Swarm - <https://github.com/wildfly-swarm-openshiftio-boosters/wfswarm-messaging-work-queue>
 
 Vert.x - <https://github.com/openshiftio-vertx-boosters/vertx-messaging-work-queue-booster>
